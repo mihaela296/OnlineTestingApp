@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:OnlineTestingApp"
+       xmlns:views="clr-namespace:OnlineTestingApp.Views"
+       x:Class="OnlineTestingApp.AppShell">
+    
+    <ShellContent Title="Главная"
+                  Route="MainPage"
+                  ContentTemplate="{DataTemplate local:MainPage}" />
+    
+    <ShellContent Title="Тест БД"
+                  Route="TestDbPage"
+                  ContentTemplate="{DataTemplate views:TestDbPage}" />
+    
+</Shell>
