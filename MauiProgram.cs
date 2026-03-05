@@ -18,9 +18,7 @@ public static class MauiProgram
             });
 
         // ==== Подключение к базе данных ====
-        // Используем ТОТ ЖЕ пароль, что и в тесте!
         var connectionString = "Server=OnlineTestingPlatform.mssql.somee.com;Database=OnlineTestingPlatform;User Id=Dorogan_SQLLogin_1;Password=x4c9e1mit9;TrustServerCertificate=true;";
-        
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 

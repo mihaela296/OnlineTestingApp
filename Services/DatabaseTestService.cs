@@ -13,23 +13,24 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<string> TestConnectionAsync()
-        {
-            try
-            {
-                var canConnect = await _dbContext.Database.CanConnectAsync();
-                
-                if (!canConnect)
-                    return "❌ Не удалось подключиться к базе данных";
+{
+    try
+    {
+        var canConnect = await _dbContext.Database.CanConnectAsync();
+        
+        if (!canConnect)
+            return "❌ Не удалось подключиться к базе данных";
 
-                var userCount = await _dbContext.Users.CountAsync();
-                var testCount = await _dbContext.Tests.CountAsync();
+        var userCount = await _dbContext.Users.CountAsync();
+        var testCount = await _dbContext.Tests.CountAsync();
 
-                return $"✅ Подключение успешно!\nПользователей: {userCount}\nТестов: {testCount}";
-            }
-            catch (Exception ex)
-            {
-                return $"❌ Ошибка: {ex.Message}";
-            }
-        }
+        return $"✅ Подключение успешно!\nПользователей: {userCount}\nТестов: {testCount}";
+    }
+    catch (Exception ex)
+    {
+        // Показываем ПОЛНУЮ информацию об ошибке
+        return $"❌ Ошибка: {ex.Message}\n\nStack Trace: {ex.StackTrace}";
+    }
+}
     }
 }

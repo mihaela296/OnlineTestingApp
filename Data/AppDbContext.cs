@@ -32,26 +32,29 @@ namespace OnlineTestingApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // ============= ЯВНОЕ УКАЗАНИЕ ПЕРВИЧНЫХ КЛЮЧЕЙ =============
+            modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
+            modelBuilder.Entity<User>().HasKey(u => u.UserId);
+            modelBuilder.Entity<Profile>().HasKey(p => p.ProfileId);
+            modelBuilder.Entity<Group>().HasKey(g => g.GroupId);
+            modelBuilder.Entity<UserGroup>().HasKey(ug => new { ug.UserId, ug.GroupId });
+            modelBuilder.Entity<Subject>().HasKey(s => s.SubjectId);
+            modelBuilder.Entity<Category>().HasKey(c => c.CategoryId);
+            modelBuilder.Entity<Test>().HasKey(t => t.TestId);
+            modelBuilder.Entity<Question>().HasKey(q => q.QuestionId);
+            modelBuilder.Entity<Answer>().HasKey(a => a.AnswerId);
+            modelBuilder.Entity<TestAttempt>().HasKey(ta => ta.AttemptId);
+            modelBuilder.Entity<UserAnswer>().HasKey(ua => ua.UserAnswerId);
+            modelBuilder.Entity<Result>().HasKey(r => r.ResultId);
+            modelBuilder.Entity<ProctoringLog>().HasKey(pl => pl.LogId);
+            modelBuilder.Entity<Log>().HasKey(l => l.LogId);
+            modelBuilder.Entity<Conversation>().HasKey(c => c.ConversationId);
+            modelBuilder.Entity<Message>().HasKey(m => m.MessageId);
+            modelBuilder.Entity<Notification>().HasKey(n => n.NotificationId);
+            modelBuilder.Entity<UserDevice>().HasKey(ud => ud.DeviceId);
+
             // ============= НАСТРОЙКА ТАБЛИЦ И СВЯЗЕЙ =============
-modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
-    modelBuilder.Entity<User>().HasKey(u => u.UserId);
-    modelBuilder.Entity<Profile>().HasKey(p => p.ProfileId);
-    modelBuilder.Entity<Group>().HasKey(g => g.GroupId);
-    modelBuilder.Entity<UserGroup>().HasKey(ug => new { ug.UserId, ug.GroupId });
-    modelBuilder.Entity<Subject>().HasKey(s => s.SubjectId);
-    modelBuilder.Entity<Category>().HasKey(c => c.CategoryId);
-    modelBuilder.Entity<Test>().HasKey(t => t.TestId);
-    modelBuilder.Entity<Question>().HasKey(q => q.QuestionId);
-    modelBuilder.Entity<Answer>().HasKey(a => a.AnswerId);
-    modelBuilder.Entity<TestAttempt>().HasKey(ta => ta.AttemptId);
-    modelBuilder.Entity<UserAnswer>().HasKey(ua => ua.UserAnswerId);
-    modelBuilder.Entity<Result>().HasKey(r => r.ResultId);
-    modelBuilder.Entity<ProctoringLog>().HasKey(pl => pl.LogId);  // ЭТО РЕШАЕТ ПРОБЛЕМУ!
-    modelBuilder.Entity<Log>().HasKey(l => l.LogId);
-    modelBuilder.Entity<Conversation>().HasKey(c => c.ConversationId);
-    modelBuilder.Entity<Message>().HasKey(m => m.MessageId);
-    modelBuilder.Entity<Notification>().HasKey(n => n.NotificationId);
-    modelBuilder.Entity<UserDevice>().HasKey(ud => ud.DeviceId);
+
             // Roles
             modelBuilder.Entity<Role>()
                 .HasIndex(r => r.RoleName)
@@ -81,10 +84,7 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .Property(g => g.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
-            // UserGroups - составной ключ и индексы
-            modelBuilder.Entity<UserGroup>()
-                .HasKey(ug => new { ug.UserId, ug.GroupId });
-
+            // UserGroups - связи (ключ уже указан выше)
             modelBuilder.Entity<UserGroup>()
                 .HasOne(ug => ug.User)
                 .WithMany(u => u.UserGroups)
@@ -115,7 +115,7 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .HasOne(t => t.CreatedByUser)
                 .WithMany(u => u.CreatedTests)
                 .HasForeignKey(t => t.CreatedByUserId)
-                .OnDelete(DeleteBehavior.Restrict); // Не удалять тесты при удалении пользователя
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Test>()
                 .HasOne(t => t.Category)
@@ -137,7 +137,7 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .HasOne(q => q.Test)
                 .WithMany(t => t.Questions)
                 .HasForeignKey(q => q.TestId)
-                .OnDelete(DeleteBehavior.Cascade); // При удалении теста удаляются и вопросы
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Answers - индексы и связи
             modelBuilder.Entity<Answer>()
@@ -147,7 +147,7 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .HasOne(a => a.Question)
                 .WithMany(q => q.Answers)
                 .HasForeignKey(a => a.QuestionId)
-                .OnDelete(DeleteBehavior.Cascade); // При удалении вопроса удаляются и ответы
+                .OnDelete(DeleteBehavior.Cascade);
 
             // TestAttempts - индексы и связи
             modelBuilder.Entity<TestAttempt>()
@@ -188,7 +188,7 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .HasOne(ua => ua.Question)
                 .WithMany(q => q.UserAnswers)
                 .HasForeignKey(ua => ua.QuestionId)
-                .OnDelete(DeleteBehavior.Restrict); // Не удалять ответы при удалении вопроса
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserAnswer>()
                 .HasOne(ua => ua.SelectedAnswer)
@@ -244,7 +244,6 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .HasIndex(c => new { c.StudentUserId, c.TeacherUserId })
                 .IsUnique();
 
-            // Проверка, что Student и Teacher - разные пользователи
             modelBuilder.Entity<Conversation>()
                 .ToTable(t => t.HasCheckConstraint("CK_Conversation_DifferentUsers", "StudentUserId != TeacherUserId"));
 
@@ -300,8 +299,6 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .OnDelete(DeleteBehavior.Cascade);
 
             // ============= НАСТРОЙКА ТИПОВ ДАННЫХ =============
-
-            // Для SQL Server, чтобы правильно обрабатывать decimal
             modelBuilder.Entity<TestAttempt>()
                 .Property(ta => ta.Score)
                 .HasPrecision(5, 2);
@@ -310,7 +307,6 @@ modelBuilder.Entity<Role>().HasKey(r => r.RoleId);
                 .Property(r => r.Score)
                 .HasPrecision(5, 2);
 
-            // Для JSON полей (можно хранить как строки)
             modelBuilder.Entity<ProctoringLog>()
                 .Property(pl => pl.Details)
                 .HasColumnType("nvarchar(max)");
