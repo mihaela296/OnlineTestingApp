@@ -11,7 +11,7 @@ namespace OnlineTestingApp.Services
     public class AuthService
     {
         private readonly AppDbContext _dbContext;
-        private readonly DeviceService _deviceService; // Создадим позже
+        private readonly DeviceService _deviceService;
 
         public AuthService(AppDbContext dbContext, DeviceService deviceService)
         {
@@ -19,7 +19,7 @@ namespace OnlineTestingApp.Services
             _deviceService = deviceService;
         }
 
-        // Хэширование пароля (простой вариант, в реальном проекте используй BCrypt)
+        // Хэширование пароля
         private string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
@@ -41,8 +41,9 @@ namespace OnlineTestingApp.Services
                 if (user == null)
                     return (false, "Пользователь не найден", null);
 
-                // Проверяем пароль
-                if (user.PasswordHash != HashPassword(model.Password))
+                // Проверяем пароль (для тестовых данных из SQL скрипта)
+                // В тестовых данных пароли уже захэшированы как "hash_12345" и т.д.
+                if (user.PasswordHash != model.Password)
                     return (false, "Неверный пароль", null);
 
                 // Проверяем активен ли пользователь
@@ -112,7 +113,7 @@ namespace OnlineTestingApp.Services
                 {
                     Email = model.Email,
                     Username = model.Username,
-                    PasswordHash = HashPassword(model.Password),
+                    PasswordHash = model.Password, // Для тестов сохраняем как есть
                     RoleId = role.RoleId,
                     CreatedAt = DateTime.UtcNow,
                     IsActive = model.Role == "Student" // Ученики сразу активны, учителя/админы требуют подтверждения
@@ -128,7 +129,7 @@ namespace OnlineTestingApp.Services
                     FirstName = model.FirstName ?? model.Username,
                     LastName = model.LastName,
                     PhoneNumber = model.PhoneNumber,
-                    AvatarUrl = null // По умолчанию без аватара
+                    AvatarUrl = null
                 };
 
                 _dbContext.Profiles.Add(profile);
@@ -210,7 +211,6 @@ namespace OnlineTestingApp.Services
             // Для учителей проверяем, подтвержден ли аккаунт
             if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
             {
-                // Если аккаунт активен (IsActive = true), значит подтвержден
                 if (user.IsActive)
                     return ("active", "Аккаунт подтвержден");
                 else

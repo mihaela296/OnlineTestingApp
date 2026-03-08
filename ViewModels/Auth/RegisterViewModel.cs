@@ -77,9 +77,9 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-        private async Task NavigateBackAsync()
+        private async Task GoToLoginAsync()
         {
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync(".."); // Возврат на страницу входа
         }
     }
 }

@@ -6,7 +6,7 @@
 
     <!-- Стили для Label -->
     <Style TargetType="Label">
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource Text}}" />
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
     </Style>
 
@@ -24,7 +24,7 @@
         <Setter Property="HorizontalOptions" Value="Center"/>
     </Style>
 
-    <!-- Стили для Entry - ИСПРАВЛЕНО! -->
+    <!-- Стили для Entry - ИСПРАВЛЕНО -->
     <Style x:Key="ModernEntry" TargetType="Entry">
         <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
         <Setter Property="TextColor" Value="{StaticResource Text}"/>
@@ -32,9 +32,6 @@
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="HeightRequest" Value="56"/>
         <Setter Property="Keyboard" Value="Default"/>
-        
-        <!-- Добавляем явный цвет текста -->
-        <Setter Property="TextColor" Value="#000000"/>
         
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>

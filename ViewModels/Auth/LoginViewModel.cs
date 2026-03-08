@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Models.Auth;
 using OnlineTestingApp.Services;
-using OnlineTestingApp.Views.Auth;
 using System;
 using System.Threading.Tasks;
 
@@ -27,12 +26,6 @@ namespace OnlineTestingApp.ViewModels.Auth
         public LoginViewModel(AuthService authService)
         {
             _authService = authService;
-            
-            // Для тестов можно подставить данные
-            #if DEBUG
-            _loginModel.Email = "ivanov@example.com";
-            _loginModel.Password = "hash_12345";
-            #endif
         }
 
         [RelayCommand]
@@ -47,7 +40,6 @@ namespace OnlineTestingApp.ViewModels.Auth
                 HasError = false;
                 ErrorMessage = string.Empty;
 
-                // Валидация
                 if (string.IsNullOrWhiteSpace(LoginModel.Email) || 
                     string.IsNullOrWhiteSpace(LoginModel.Password))
                 {
@@ -65,10 +57,7 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                // Проверяем статус пользователя
                 var status = await _authService.GetUserStatusAsync(result.user!.UserId);
-                
-                // Навигация в зависимости от статуса
                 await NavigateBasedOnStatus(status.status, result.user.UserId);
             }
             catch (Exception ex)
@@ -83,7 +72,7 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-        private async Task NavigateToRegisterAsync()
+        private async Task GoToRegisterAsync()
         {
             await Shell.Current.GoToAsync("RegisterPage");
         }
@@ -100,7 +89,6 @@ namespace OnlineTestingApp.ViewModels.Auth
                     break;
                 case "active":
                 default:
-                    // Здесь позже добавим навигацию на дашборд в зависимости от роли
                     await Shell.Current.GoToAsync("//StudentDashboardPage");
                     break;
             }
