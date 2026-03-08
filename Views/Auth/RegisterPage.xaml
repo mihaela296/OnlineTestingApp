@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:OnlineTestingApp.Converters"
+             x:Class="OnlineTestingApp.Views.Auth.RegisterPage"
+             Title="Регистрация"
+             BackgroundColor="{StaticResource Background}">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:IsEqualConverter x:Key="IsEqualConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="24" Padding="24">
+                
+                <!-- Заголовок -->
+                <VerticalStackLayout Spacing="8" Margin="0,20,0,20">
+                    <Label Text="Создать аккаунт" 
+                           Style="{StaticResource TitleStyle}"/>
+                    
+                    <Label Text="Заполните форму для регистрации"
+                           Style="{StaticResource SubtitleStyle}"/>
+                </VerticalStackLayout>
+
+                <!-- Карточка с формой -->
+                <Border Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="16">
+                        
+                        <!-- Роль -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Я хочу зарегистрироваться как"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Picker ItemsSource="{Binding Roles}"
+                                   SelectedItem="{Binding RegisterModel.Role}"
+                                   BackgroundColor="{StaticResource SurfaceVariant}"
+                                   Title="Выберите роль"
+                                   FontSize="16"
+                                   HeightRequest="56"/>
+                        </VerticalStackLayout>
+
+                        <!-- Имя пользователя -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Имя пользователя *"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Entry Text="{Binding RegisterModel.Username}"
+                                   Placeholder="Придумайте имя пользователя"
+                                   Style="{StaticResource ModernEntry}"/>
+                        </VerticalStackLayout>
+
+                        <!-- Email -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Email *"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Entry Text="{Binding RegisterModel.Email}"
+                                   Placeholder="Введите ваш email"
+                                   Style="{StaticResource ModernEntry}"
+                                   Keyboard="Email"/>
+                        </VerticalStackLayout>
+
+                        <!-- Имя и Фамилия (опционально) -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="8">
+                                <Label Text="Имя"
+                                       FontSize="14"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                
+                                <Entry Text="{Binding RegisterModel.FirstName}"
+                                       Placeholder="Иван"
+                                       Style="{StaticResource ModernEntry}"/>
+                            </VerticalStackLayout>
+                            
+                            <VerticalStackLayout Grid.Column="1" Spacing="8">
+                                <Label Text="Фамилия"
+                                       FontSize="14"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                
+                                <Entry Text="{Binding RegisterModel.LastName}"
+                                       Placeholder="Иванов"
+                                       Style="{StaticResource ModernEntry}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Телефон -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Телефон"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Entry Text="{Binding RegisterModel.PhoneNumber}"
+                                   Placeholder="+7 (999) 123-45-67"
+                                   Style="{StaticResource ModernEntry}"
+                                   Keyboard="Telephone"/>
+                        </VerticalStackLayout>
+
+                        <!-- Пароль -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Пароль *"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Entry Text="{Binding RegisterModel.Password}"
+                                   Placeholder="Минимум 6 символов"
+                                   Style="{StaticResource ModernEntry}"
+                                   IsPassword="True"/>
+                        </VerticalStackLayout>
+
+                        <!-- Подтверждение пароля -->
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Подтвердите пароль *"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            
+                            <Entry Text="{Binding RegisterModel.ConfirmPassword}"
+                                   Placeholder="Повторите пароль"
+                                   Style="{StaticResource ModernEntry}"
+                                   IsPassword="True"/>
+                        </VerticalStackLayout>
+
+                        <!-- Сообщение об ошибке - ЗАМЕНИЛ FRAME НА BORDER -->
+                        <Border x:Name="ErrorFrame"
+                               IsVisible="{Binding HasError}"
+                               BackgroundColor="{StaticResource Error}"
+                               Padding="12"
+                               StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="White"
+                                   FontSize="14"/>
+                        </Border>
+
+                        <!-- Подсказки по ролям - ЗАМЕНИЛ FRAME НА BORDER -->
+                        <Border x:Name="RoleHintFrame"
+                               IsVisible="{Binding RegisterModel.Role, Converter={StaticResource IsEqualConverter}, ConverterParameter=Teacher}"
+                               BackgroundColor="{StaticResource Info}"
+                               Padding="12"
+                               StrokeThickness="0"
+                               Opacity="0.9">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+                            <Label Text="Регистрация учителя требует подтверждения администратором. После регистрации вы получите уведомление."
+                                   TextColor="White"
+                                   FontSize="13"/>
+                        </Border>
+
+                        <!-- Кнопка регистрации -->
+                        <Button Text="Зарегистрироваться"
+                                Command="{Binding RegisterCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                Style="{StaticResource PrimaryButtonStyle}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button" 
+                                            Binding="{Binding IsBusy}" 
+                                            Value="True">
+                                    <Setter Property="Text" Value="Регистрация..."/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <!-- Ссылка на вход -->
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                            <Label Text="Уже есть аккаунт?" 
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="Войти"
+                                   TextColor="{StaticResource Primary}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding NavigateBackCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Индикатор загрузки -->
+                <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                  IsRunning="{Binding IsBusy}"
+                                  Style="{StaticResource ModernActivityIndicator}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
