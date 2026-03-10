@@ -9,13 +9,13 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         
-        // Регистрируем ВСЕ маршруты для навигации
+        // Регистрируем маршруты
+        Routing.RegisterRoute("LoginPage", typeof(LoginPage));
         Routing.RegisterRoute("RegisterPage", typeof(RegisterPage));
         Routing.RegisterRoute("StudentDashboardPage", typeof(StudentDashboardPage));
         Routing.RegisterRoute("TeacherDashboardPage", typeof(TeacherDashboardPage));
         Routing.RegisterRoute("AdminDashboardPage", typeof(AdminDashboardPage));
         Routing.RegisterRoute("PendingGroupPage", typeof(PendingGroupPage));
         Routing.RegisterRoute("PendingApprovalPage", typeof(PendingApprovalPage));
-        Routing.RegisterRoute("TestDbPage", typeof(TestDbPage));
     }
 }

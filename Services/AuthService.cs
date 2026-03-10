@@ -19,7 +19,6 @@ namespace OnlineTestingApp.Services
             _deviceService = deviceService;
         }
 
-        // Хэширование пароля
         private string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
@@ -27,12 +26,10 @@ namespace OnlineTestingApp.Services
             return Convert.ToBase64String(hashedBytes);
         }
 
-        // Вход пользователя
         public async Task<(bool success, string message, User? user)> LoginAsync(LoginModel model)
         {
             try
             {
-                // Ищем пользователя по email
                 var user = await _dbContext.Users
                     .Include(u => u.Role)
                     .Include(u => u.Profile)
@@ -41,29 +38,18 @@ namespace OnlineTestingApp.Services
                 if (user == null)
                     return (false, "Пользователь не найден", null);
 
-                // Проверяем пароль (для тестовых данных из SQL скрипта)
-                // В тестовых данных пароли уже захэшированы как "hash_12345" и т.д.
                 if (user.PasswordHash != model.Password)
                     return (false, "Неверный пароль", null);
 
-                // Проверяем активен ли пользователь
                 if (!user.IsActive)
                     return (false, "Ваш аккаунт деактивирован. Обратитесь к администратору.", null);
 
-                // Обновляем дату последнего входа
                 user.LastLoginDate = DateTime.UtcNow;
                 
-                // Сохраняем информацию об устройстве
                 await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
-                
                 await _dbContext.SaveChangesAsync();
 
-                // Сохраняем информацию о пользователе в SecureStorage
-                await SecureStorage.SetAsync("user_id", user.UserId.ToString());
-                await SecureStorage.SetAsync("user_email", user.Email);
-                await SecureStorage.SetAsync("user_role", user.Role?.RoleName ?? "Student");
-                
-                // Сохраняем объект пользователя в Preferences для быстрого доступа
+                // Сохраняем только в Preferences (работает на всех платформах)
                 var userJson = JsonSerializer.Serialize(new
                 {
                     user.UserId,
@@ -82,47 +68,41 @@ namespace OnlineTestingApp.Services
             }
         }
 
-        // Регистрация пользователя
         public async Task<(bool success, string message, User? user)> RegisterAsync(RegisterModel model)
         {
             try
             {
-                // Проверяем, существует ли пользователь с таким email
                 var existingUser = await _dbContext.Users
                     .FirstOrDefaultAsync(u => u.Email == model.Email);
                 
                 if (existingUser != null)
                     return (false, "Пользователь с таким email уже существует", null);
 
-                // Проверяем, существует ли пользователь с таким username
                 existingUser = await _dbContext.Users
                     .FirstOrDefaultAsync(u => u.Username == model.Username);
                 
                 if (existingUser != null)
                     return (false, "Пользователь с таким именем уже существует", null);
 
-                // Получаем роль
                 var role = await _dbContext.Roles
                     .FirstOrDefaultAsync(r => r.RoleName == model.Role);
                 
                 if (role == null)
                     return (false, "Указанная роль не существует", null);
 
-                // Создаем нового пользователя
                 var user = new User
                 {
                     Email = model.Email,
                     Username = model.Username,
-                    PasswordHash = model.Password, // Для тестов сохраняем как есть
+                    PasswordHash = model.Password,
                     RoleId = role.RoleId,
                     CreatedAt = DateTime.UtcNow,
-                    IsActive = model.Role == "Student" // Ученики сразу активны, учителя/админы требуют подтверждения
+                    IsActive = model.Role == "Student"
                 };
 
                 _dbContext.Users.Add(user);
                 await _dbContext.SaveChangesAsync();
 
-                // Создаем профиль
                 var profile = new Profile
                 {
                     UserId = user.UserId,
@@ -135,7 +115,6 @@ namespace OnlineTestingApp.Services
                 _dbContext.Profiles.Add(profile);
                 await _dbContext.SaveChangesAsync();
 
-                // Если это ученик, добавляем запись в логи
                 if (model.Role == "Student")
                 {
                     _dbContext.Logs.Add(new Log
@@ -156,9 +135,8 @@ namespace OnlineTestingApp.Services
                         Details = "Учитель зарегистрировался, ожидает подтверждения"
                     });
                     
-                    // Создаем уведомление для админов
                     var admins = await _dbContext.Users
-                        .Where(u => u.RoleId == 3) // Admin role
+                        .Where(u => u.RoleId == 3)
                         .ToListAsync();
                     
                     foreach (var admin in admins)
@@ -185,7 +163,6 @@ namespace OnlineTestingApp.Services
             }
         }
 
-        // Проверка статуса пользователя
         public async Task<(string status, string message)> GetUserStatusAsync(int userId)
         {
             var user = await _dbContext.Users
@@ -198,7 +175,6 @@ namespace OnlineTestingApp.Services
             if (!user.IsActive)
                 return ("inactive", "Ваш аккаунт деактивирован");
 
-            // Для учеников проверяем, добавлены ли они в группу
             if (user.Role?.RoleName == "Student")
             {
                 var hasGroups = await _dbContext.UserGroups
@@ -208,7 +184,6 @@ namespace OnlineTestingApp.Services
                     return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
             }
 
-            // Для учителей проверяем, подтвержден ли аккаунт
             if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
             {
                 if (user.IsActive)
@@ -220,10 +195,8 @@ namespace OnlineTestingApp.Services
             return ("active", "Аккаунт активен");
         }
 
-        // Выход из системы
         public Task LogoutAsync()
         {
-            SecureStorage.RemoveAll();
             Preferences.Clear();
             return Task.CompletedTask;
         }

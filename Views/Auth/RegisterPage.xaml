@@ -178,6 +178,7 @@
                         Padding="0"/>
             </Grid>
 
+            <!-- Сообщение об ошибке -->
             <Border x:Name="ErrorFrame"
                    IsVisible="{Binding HasError}"
                    BackgroundColor="#FEE2E2"
@@ -193,6 +194,7 @@
                        HorizontalOptions="Center"/>
             </Border>
 
+            <!-- Подсказка для учителя -->
             <Border x:Name="RoleHintFrame"
                    IsVisible="{Binding RegisterModel.Role, Converter={StaticResource IsEqualConverter}, ConverterParameter=Teacher}"
                    BackgroundColor="#EFF6FF"
@@ -207,6 +209,7 @@
                        FontSize="12"/>
             </Border>
 
+            <!-- Кнопка регистрации - УМЕНЬШЕНА И ОТЦЕНТРИРОВАНА -->
             <Button Text="Зарегистрироваться"
                     Command="{Binding RegisterCommand}"
                     BackgroundColor="#6366F1"
@@ -214,9 +217,12 @@
                     FontSize="15"
                     FontAttributes="Bold"
                     HeightRequest="48"
+                    WidthRequest="220"
+                    HorizontalOptions="Center"
                     CornerRadius="24"
-                    Margin="0,5,0,10"/>
+                    Margin="0,5,0,15"/>
 
+            <!-- Ссылка на вход -->
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
                 <Label Text="Уже есть аккаунт?" 
                        TextColor="#4B5563"

@@ -66,7 +66,7 @@ namespace OnlineTestingApp.ViewModels.Auth
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Ошибка: {ex.Message}";
+                ErrorMessage = $"Ошибка входа: {ex.Message}";
                 HasError = true;
             }
             finally
@@ -109,16 +109,21 @@ namespace OnlineTestingApp.ViewModels.Auth
                     switch (user.Role?.RoleName)
                     {
                         case "Student":
-                            await Shell.Current.GoToAsync("//StudentDashboardPage");
+                            // Заменяем текущую страницу на дашборд студента
+                            Application.Current.MainPage = new AppShell();
+                            await Shell.Current.GoToAsync("StudentDashboardPage");
                             break;
                         case "Teacher":
-                            await Shell.Current.GoToAsync("//TeacherDashboardPage");
+                            Application.Current.MainPage = new AppShell();
+                            await Shell.Current.GoToAsync("TeacherDashboardPage");
                             break;
                         case "Admin":
-                            await Shell.Current.GoToAsync("//AdminDashboardPage");
+                            Application.Current.MainPage = new AppShell();
+                            await Shell.Current.GoToAsync("AdminDashboardPage");
                             break;
                         default:
-                            await Shell.Current.GoToAsync("//StudentDashboardPage");
+                            Application.Current.MainPage = new AppShell();
+                            await Shell.Current.GoToAsync("StudentDashboardPage");
                             break;
                     }
                     break;
