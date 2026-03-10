@@ -14,194 +14,217 @@
     </ContentPage.Resources>
 
     <ScrollView>
-        <VerticalStackLayout Spacing="16" Padding="24">
+        <VerticalStackLayout Spacing="0" Padding="24">
             
-            <!-- Заголовок -->
             <Label Text="Создать аккаунт" 
-                   FontSize="32"
+                   FontSize="28"
                    TextColor="#111827"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   Margin="0,0,0,8"/>
+                   Margin="0,0,0,4"/>
             
             <Label Text="Заполните форму для регистрации"
-                   FontSize="16"
+                   FontSize="14"
                    TextColor="#4B5563"
                    HorizontalOptions="Center"
-                   Margin="0,0,0,24"/>
+                   Margin="0,0,0,20"/>
 
-            <!-- Роль -->
             <Label Text="Я хочу зарегистрироваться как"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
             <Picker ItemsSource="{Binding Roles}"
                    SelectedItem="{Binding RegisterModel.Role}"
                    BackgroundColor="#F3F4F6"
                    Title="Выберите роль"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+                   FontSize="15"
+                   HeightRequest="45"
+                   Margin="0,0,0,10"/>
 
-            <!-- Имя пользователя -->
             <Label Text="Имя пользователя *"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
             <Entry Text="{Binding RegisterModel.Username}"
-                   Placeholder="Придумайте имя пользователя"
+                   Placeholder="Придумайте имя"
                    BackgroundColor="#F3F4F6"
                    TextColor="#111827"
                    PlaceholderColor="#9CA3AF"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+                   FontSize="15"
+                   HeightRequest="45"
+                   Margin="0,0,0,10"/>
 
-            <!-- Email -->
             <Label Text="Email *"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
             <Entry Text="{Binding RegisterModel.Email}"
-                   Placeholder="Введите ваш email"
-                   BackgroundColor="#F3F4F6"
-                   TextColor="#111827"
-                   PlaceholderColor="#9CA3AF"
+                   Placeholder="email@example.com"
                    Keyboard="Email"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
-
-            <!-- Имя -->
-            <Label Text="Имя"
-                   TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
-            
-            <Entry Text="{Binding RegisterModel.FirstName}"
-                   Placeholder="Иван"
                    BackgroundColor="#F3F4F6"
                    TextColor="#111827"
                    PlaceholderColor="#9CA3AF"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+                   FontSize="15"
+                   HeightRequest="45"
+                   Margin="0,0,0,10"/>
 
-            <!-- Фамилия -->
-            <Label Text="Фамилия"
-                   TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
-            
-            <Entry Text="{Binding RegisterModel.LastName}"
-                   Placeholder="Иванов"
-                   BackgroundColor="#F3F4F6"
-                   TextColor="#111827"
-                   PlaceholderColor="#9CA3AF"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label Text="Имя"
+                           TextColor="#374151"
+                           FontSize="13"
+                           Margin="0,0,0,2"/>
+                    <Entry Text="{Binding RegisterModel.FirstName}"
+                           Placeholder="Иван"
+                           BackgroundColor="#F3F4F6"
+                           TextColor="#111827"
+                           PlaceholderColor="#9CA3AF"
+                           FontSize="15"
+                           HeightRequest="45"
+                           Margin="0,0,0,10"/>
+                </VerticalStackLayout>
+                
+                <VerticalStackLayout Grid.Column="1">
+                    <Label Text="Фамилия"
+                           TextColor="#374151"
+                           FontSize="13"
+                           Margin="0,0,0,2"/>
+                    <Entry Text="{Binding RegisterModel.LastName}"
+                           Placeholder="Иванов"
+                           BackgroundColor="#F3F4F6"
+                           TextColor="#111827"
+                           PlaceholderColor="#9CA3AF"
+                           FontSize="15"
+                           HeightRequest="45"
+                           Margin="0,0,0,10"/>
+                </VerticalStackLayout>
+            </Grid>
 
-            <!-- Телефон -->
             <Label Text="Телефон"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
             <Entry Text="{Binding RegisterModel.PhoneNumber}"
                    Placeholder="+7 (999) 123-45-67"
+                   Keyboard="Telephone"
                    BackgroundColor="#F3F4F6"
                    TextColor="#111827"
                    PlaceholderColor="#9CA3AF"
-                   Keyboard="Telephone"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+                   FontSize="15"
+                   HeightRequest="45"
+                   Margin="0,0,0,10"/>
 
-            <!-- Пароль -->
+            <!-- Пароль с глазиком -->
             <Label Text="Пароль *"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
-            <Entry Text="{Binding RegisterModel.Password}"
-                   Placeholder="Минимум 6 символов"
-                   BackgroundColor="#F3F4F6"
-                   TextColor="#111827"
-                   PlaceholderColor="#9CA3AF"
-                   IsPassword="True"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+            <Grid ColumnDefinitions="*, 50" Margin="0,0,0,10">
+                <Entry x:Name="PasswordEntry"
+                       Grid.Column="0"
+                       Text="{Binding RegisterModel.Password}"
+                       Placeholder="Минимум 6 символов"
+                       BackgroundColor="#F3F4F6"
+                       TextColor="#111827"
+                       PlaceholderColor="#9CA3AF"
+                       IsPassword="True"
+                       FontSize="15"
+                       HeightRequest="45"/>
+                
+                <Button x:Name="TogglePasswordButton"
+                        Grid.Column="1"
+                        Clicked="OnTogglePasswordClicked"
+                        BackgroundColor="Transparent"
+                        Text="👁️"
+                        FontSize="24"
+                        TextColor="#6366F1"
+                        HeightRequest="45"
+                        WidthRequest="50"
+                        Padding="0"/>
+            </Grid>
 
-            <!-- Подтверждение пароля -->
+            <!-- Подтверждение пароля с глазиком -->
             <Label Text="Подтвердите пароль *"
                    TextColor="#374151"
-                   FontSize="14"
-                   Margin="0,0,0,4"/>
+                   FontSize="13"
+                   Margin="0,0,0,2"/>
             
-            <Entry Text="{Binding RegisterModel.ConfirmPassword}"
-                   Placeholder="Повторите пароль"
-                   BackgroundColor="#F3F4F6"
-                   TextColor="#111827"
-                   PlaceholderColor="#9CA3AF"
-                   IsPassword="True"
-                   FontSize="16"
-                   HeightRequest="56"
-                   Margin="0,0,0,16"/>
+            <Grid ColumnDefinitions="*, 50" Margin="0,0,0,10">
+                <Entry x:Name="ConfirmPasswordEntry"
+                       Grid.Column="0"
+                       Text="{Binding RegisterModel.ConfirmPassword}"
+                       Placeholder="Повторите пароль"
+                       BackgroundColor="#F3F4F6"
+                       TextColor="#111827"
+                       PlaceholderColor="#9CA3AF"
+                       IsPassword="True"
+                       FontSize="15"
+                       HeightRequest="45"/>
+                
+                <Button x:Name="ToggleConfirmPasswordButton"
+                        Grid.Column="1"
+                        Clicked="OnToggleConfirmPasswordClicked"
+                        BackgroundColor="Transparent"
+                        Text="👁️"
+                        FontSize="24"
+                        TextColor="#6366F1"
+                        HeightRequest="45"
+                        WidthRequest="50"
+                        Padding="0"/>
+            </Grid>
 
-            <!-- Сообщение об ошибке -->
             <Border x:Name="ErrorFrame"
                    IsVisible="{Binding HasError}"
-                   BackgroundColor="#EF4444"
-                   Padding="12"
+                   BackgroundColor="#FEE2E2"
+                   Padding="10"
                    StrokeThickness="0"
-                   Margin="0,0,0,16">
+                   Margin="0,0,0,10">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
+                    <RoundRectangle CornerRadius="8"/>
                 </Border.StrokeShape>
                 <Label Text="{Binding ErrorMessage}"
-                       TextColor="White"
-                       FontSize="14"
+                       TextColor="#DC2626"
+                       FontSize="13"
                        HorizontalOptions="Center"/>
             </Border>
 
-            <!-- Подсказка для учителя -->
             <Border x:Name="RoleHintFrame"
                    IsVisible="{Binding RegisterModel.Role, Converter={StaticResource IsEqualConverter}, ConverterParameter=Teacher}"
-                   BackgroundColor="#3B82F6"
-                   Padding="12"
+                   BackgroundColor="#EFF6FF"
+                   Padding="10"
                    StrokeThickness="0"
-                   Opacity="0.9"
-                   Margin="0,0,0,16">
+                   Margin="0,0,0,10">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12"/>
+                    <RoundRectangle CornerRadius="8"/>
                 </Border.StrokeShape>
-                <Label Text="Регистрация учителя требует подтверждения администратором. После регистрации вы получите уведомление."
-                       TextColor="White"
-                       FontSize="13"/>
+                <Label Text="Регистрация учителя требует подтверждения администратором"
+                       TextColor="#1E40AF"
+                       FontSize="12"/>
             </Border>
 
-            <!-- Кнопка регистрации -->
             <Button Text="Зарегистрироваться"
                     Command="{Binding RegisterCommand}"
                     BackgroundColor="#6366F1"
                     TextColor="White"
-                    FontSize="16"
+                    FontSize="15"
                     FontAttributes="Bold"
-                    HeightRequest="56"
-                    CornerRadius="28"
-                    Margin="0,0,0,16"/>
+                    HeightRequest="48"
+                    CornerRadius="24"
+                    Margin="0,5,0,10"/>
 
-            <!-- Ссылка на вход - ИСПРАВЛЕНО -->
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
                 <Label Text="Уже есть аккаунт?" 
-                       TextColor="#4B5563"/>
+                       TextColor="#4B5563"
+                       FontSize="13"/>
                 <Label Text="Войти"
-                       TextColor="#6366F1">
+                       TextColor="#6366F1"
+                       FontSize="13"
+                       FontAttributes="Bold">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToLoginCommand}"/>
                     </Label.GestureRecognizers>

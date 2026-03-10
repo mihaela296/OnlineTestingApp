@@ -1,45 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:local="clr-namespace:OnlineTestingApp"
-       xmlns:views="clr-namespace:OnlineTestingApp.Views"
        xmlns:auth="clr-namespace:OnlineTestingApp.Views.Auth"
-       x:Class="OnlineTestingApp.AppShell">
+       x:Class="OnlineTestingApp.AppShell"
+       FlyoutBehavior="Disabled">
     
-    <!-- Регистрируем маршруты для страниц авторизации -->
+    <!-- Только стартовая страница - всё остальное через навигацию -->
     <ShellContent Title="Вход"
                   Route="LoginPage"
                   ContentTemplate="{DataTemplate auth:LoginPage}" />
-    
-    <ShellContent Title="Регистрация"
-                  Route="RegisterPage"
-                  ContentTemplate="{DataTemplate auth:RegisterPage}" />
-    
-    <!-- Страницы ожидания -->
-    <ShellContent Title="Ожидание группы"
-                  Route="PendingGroupPage"
-                  ContentTemplate="{DataTemplate views:PendingGroupPage}" />
-    
-    <ShellContent Title="Ожидание подтверждения"
-                  Route="PendingApprovalPage"
-                  ContentTemplate="{DataTemplate views:PendingApprovalPage}" />
-    
-    <!-- Дашборды (скрыты, будут открываться программно) -->
-    <ShellContent Title="Главная ученика"
-                  Route="StudentDashboardPage"
-                  ContentTemplate="{DataTemplate views:StudentDashboardPage}" />
-    
-    <ShellContent Title="Главная учителя"
-                  Route="TeacherDashboardPage"
-                  ContentTemplate="{DataTemplate views:TeacherDashboardPage}" />
-    
-    <ShellContent Title="Главная админа"
-                  Route="AdminDashboardPage"
-                  ContentTemplate="{DataTemplate views:AdminDashboardPage}" />
-    
-    <!-- Страница теста БД (для отладки) -->
-    <ShellContent Title="Тест БД"
-                  Route="TestDbPage"
-                  ContentTemplate="{DataTemplate views:TestDbPage}" />
     
 </Shell>

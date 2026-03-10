@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OnlineTestingApp.Models;
 using OnlineTestingApp.Models.Auth;
 using OnlineTestingApp.Services;
 using System;
@@ -22,6 +23,9 @@ namespace OnlineTestingApp.ViewModels.Auth
 
         [ObservableProperty]
         private bool _hasError;
+
+        [ObservableProperty]
+        private bool _isPasswordVisible = false;
 
         public LoginViewModel(AuthService authService)
         {
@@ -57,8 +61,8 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                var status = await _authService.GetUserStatusAsync(result.user!.UserId);
-                await NavigateBasedOnStatus(status.status, result.user.UserId);
+                var user = result.user;
+                await NavigateBasedOnRole(user);
             }
             catch (Exception ex)
             {
@@ -77,19 +81,49 @@ namespace OnlineTestingApp.ViewModels.Auth
             await Shell.Current.GoToAsync("RegisterPage");
         }
 
-        private async Task NavigateBasedOnStatus(string status, int userId)
+        [RelayCommand]
+        private void TogglePasswordVisibility()
         {
-            switch (status)
+            IsPasswordVisible = !IsPasswordVisible;
+        }
+
+        private async Task NavigateBasedOnRole(User? user)
+        {
+            if (user == null)
+            {
+                await Shell.Current.GoToAsync("LoginPage");
+                return;
+            }
+
+            var status = await _authService.GetUserStatusAsync(user.UserId);
+            
+            switch (status.status)
             {
                 case "pending_group":
-                    await Shell.Current.GoToAsync($"PendingGroupPage?userId={userId}");
+                    await Shell.Current.GoToAsync("PendingGroupPage");
                     break;
                 case "pending_approval":
-                    await Shell.Current.GoToAsync($"PendingApprovalPage?userId={userId}");
+                    await Shell.Current.GoToAsync("PendingApprovalPage");
                     break;
                 case "active":
+                    switch (user.Role?.RoleName)
+                    {
+                        case "Student":
+                            await Shell.Current.GoToAsync("//StudentDashboardPage");
+                            break;
+                        case "Teacher":
+                            await Shell.Current.GoToAsync("//TeacherDashboardPage");
+                            break;
+                        case "Admin":
+                            await Shell.Current.GoToAsync("//AdminDashboardPage");
+                            break;
+                        default:
+                            await Shell.Current.GoToAsync("//StudentDashboardPage");
+                            break;
+                    }
+                    break;
                 default:
-                    await Shell.Current.GoToAsync("//StudentDashboardPage");
+                    await Shell.Current.GoToAsync("LoginPage");
                     break;
             }
         }

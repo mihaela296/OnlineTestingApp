@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OnlineTestingApp.Models;
 using OnlineTestingApp.Models.Auth;
 using OnlineTestingApp.Services;
 using System.Collections.Generic;
@@ -26,6 +27,12 @@ namespace OnlineTestingApp.ViewModels.Auth
         [ObservableProperty]
         private List<string> _roles = new() { "Student", "Teacher" };
 
+        [ObservableProperty]
+        private bool _isPasswordVisible = false;
+
+        [ObservableProperty]
+        private bool _isConfirmPasswordVisible = false;
+
         public RegisterViewModel(AuthService authService)
         {
             _authService = authService;
@@ -49,6 +56,13 @@ namespace OnlineTestingApp.ViewModels.Auth
                     string.IsNullOrWhiteSpace(RegisterModel.Password))
                 {
                     ErrorMessage = "Заполните все обязательные поля";
+                    HasError = true;
+                    return;
+                }
+
+                if (RegisterModel.Password != RegisterModel.ConfirmPassword)
+                {
+                    ErrorMessage = "Пароли не совпадают";
                     HasError = true;
                     return;
                 }
@@ -79,7 +93,19 @@ namespace OnlineTestingApp.ViewModels.Auth
         [RelayCommand]
         private async Task GoToLoginAsync()
         {
-            await Shell.Current.GoToAsync(".."); // Возврат на страницу входа
+            await Shell.Current.GoToAsync("..");
+        }
+
+        [RelayCommand]
+        private void TogglePasswordVisibility()
+        {
+            IsPasswordVisible = !IsPasswordVisible;
+        }
+
+        [RelayCommand]
+        private void ToggleConfirmPasswordVisibility()
+        {
+            IsConfirmPasswordVisible = !IsConfirmPasswordVisible;
         }
     }
 }
