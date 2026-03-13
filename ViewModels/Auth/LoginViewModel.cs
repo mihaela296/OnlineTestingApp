@@ -76,17 +76,37 @@ namespace OnlineTestingApp.ViewModels.Auth
             }
         }
 
-        [RelayCommand]
-        private async Task GoToRegisterAsync()
-        {
-            await Shell.Current.GoToAsync("RegisterPage");
-        }
-
+[RelayCommand]
+private async Task GoToRegisterAsync()
+{
+    try
+    {
+        var registerPage = new RegisterPage(
+            new RegisterViewModel(_authService)
+        );
+        await Application.Current.MainPage.Navigation.PushAsync(registerPage);
+        System.Diagnostics.Debug.WriteLine("✅ Переход на RegisterPage выполнен");
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
+        await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+    }
+}
         [RelayCommand]
         private void TogglePasswordVisibility()
         {
             IsPasswordVisible = !IsPasswordVisible;
         }
+
+        [RelayCommand]
+private async Task ForgotPasswordAsync()
+{
+    var page = new ForgotPasswordPage(
+        new ForgotPasswordViewModel(_authService)
+    );
+    await Application.Current.MainPage.Navigation.PushAsync(page);
+}
 
         private async Task NavigateBasedOnRole(User? user)
         {
@@ -110,7 +130,6 @@ namespace OnlineTestingApp.ViewModels.Auth
                     switch (user.Role?.RoleName)
                     {
                         case "Student":
-                            // Заменяем текущую страницу на дашборд студента
                             Application.Current.MainPage = new AppShell();
                             await Shell.Current.GoToAsync("StudentDashboardPage");
                             break;
@@ -133,14 +152,5 @@ namespace OnlineTestingApp.ViewModels.Auth
                     break;
             }
         }
-                [RelayCommand]
-        private async Task ForgotPasswordAsync()
-        {
-            var page = new ForgotPasswordPage(
-                new ForgotPasswordViewModel(_authService)
-            );
-            await Shell.Current.Navigation.PushAsync(page);
-        }
-
     }
 }

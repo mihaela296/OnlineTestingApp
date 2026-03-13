@@ -11,16 +11,16 @@ namespace OnlineTestingApp.Services
     public class EmailService : IEmailService
     {
         private readonly string _smtpServer = "smtp.mail.ru";
-        private readonly int _smtpPort = 465;
-        private readonly string _senderEmail = "твой-email@mail.ru"; // 🔴 ЗАМЕНИ
-        private readonly string _senderPassword = "твой-пароль-приложения"; // 🔴 ЗАМЕНИ
+        private readonly int _smtpPort = 587; // Порт для TLS
+        private readonly string _senderEmail = "mihaeladorogan298@mail.ru";
+        private readonly string _senderPassword = "qWOvrMrmOR564oxFVf23";
 
         public async Task SendResetCodeAsync(string toEmail, string code)
         {
             using var client = new SmtpClient(_smtpServer, _smtpPort)
             {
                 Credentials = new NetworkCredential(_senderEmail, _senderPassword),
-                EnableSsl = true
+                EnableSsl = true // Для порта 587 обязательно True (TLS)
             };
 
             var mailMessage = new MailMessage

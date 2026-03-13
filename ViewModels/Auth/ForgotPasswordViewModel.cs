@@ -28,7 +28,7 @@ namespace OnlineTestingApp.ViewModels.Auth
             _authService = authService;
         }
 
-        [RelayCommand]
+                [RelayCommand]
         private async Task SendResetCodeAsync()
         {
             if (IsBusy || string.IsNullOrWhiteSpace(Email))
@@ -39,7 +39,11 @@ namespace OnlineTestingApp.ViewModels.Auth
                 IsBusy = true;
                 HasMessage = false;
 
+                System.Diagnostics.Debug.WriteLine($"🔵 Отправка кода для email: {Email}");
+                
                 var result = await _authService.RequestPasswordResetAsync(Email);
+
+                System.Diagnostics.Debug.WriteLine($"✅ Результат: success={result.success}, message={result.message}");
 
                 Message = result.message;
                 IsSuccess = result.success;
@@ -56,6 +60,7 @@ namespace OnlineTestingApp.ViewModels.Auth
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"❌ Исключение: {ex.Message}");
                 Message = $"Ошибка: {ex.Message}";
                 IsSuccess = false;
                 HasMessage = true;

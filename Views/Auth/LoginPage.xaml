@@ -88,13 +88,13 @@
                 </HorizontalStackLayout>
                 
                 <Button Grid.Column="1"
-                        Text="Забыли пароль?"
-                        BackgroundColor="Transparent"
-                        TextColor="#6366F1"
-                        FontSize="13"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        Clicked="OnForgotPasswordButtonClicked"/>
+        Text="Забыли пароль?"
+        BackgroundColor="Transparent"
+        TextColor="#6366F1"
+        FontSize="13"
+        HorizontalOptions="End"
+        VerticalOptions="Center"
+        Command="{Binding ForgotPasswordCommand}"/>
             </Grid>
 
             <!-- Сообщение об ошибке -->

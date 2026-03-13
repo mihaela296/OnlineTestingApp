@@ -12,15 +12,14 @@ namespace OnlineTestingApp.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly DeviceService _deviceService;
-
-            private readonly IEmailService _emailService;
+        private readonly IEmailService _emailService;
 
         public AuthService(AppDbContext dbContext, DeviceService deviceService, IEmailService emailService)
-{
-    _dbContext = dbContext;
-    _deviceService = deviceService;
-    _emailService = emailService;
-}
+        {
+            _dbContext = dbContext;
+            _deviceService = deviceService;
+            _emailService = emailService;
+        }
 
         private string HashPassword(string password)
         {
@@ -52,7 +51,6 @@ namespace OnlineTestingApp.Services
                 await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
                 await _dbContext.SaveChangesAsync();
 
-                // Сохраняем только в Preferences (работает на всех платформах)
                 var userJson = JsonSerializer.Serialize(new
                 {
                     user.UserId,
@@ -97,7 +95,7 @@ namespace OnlineTestingApp.Services
                 {
                     Email = model.Email,
                     Username = model.Username,
-                    PasswordHash = model.Password,
+                    PasswordHash = HashPassword(model.Password),
                     RoleId = role.RoleId,
                     CreatedAt = DateTime.UtcNow,
                     IsActive = model.Role == "Student"
@@ -218,6 +216,10 @@ namespace OnlineTestingApp.Services
                 if (user == null)
                     return (true, "Если email зарегистрирован, код будет отправлен");
 
+                // Проверка почтового сервиса
+                if (_emailService == null)
+                    return (false, "Ошибка конфигурации почтового сервиса");
+
                 var code = GenerateResetCode();
                 _resetCodes[email] = (code, DateTime.UtcNow.AddMinutes(15));
 
@@ -253,7 +255,8 @@ namespace OnlineTestingApp.Services
             if (user == null || !_resetCodes.ContainsKey(email))
                 return (false, "Ошибка");
 
-            user.PasswordHash = newPassword;
+            // Хэшируем новый пароль
+            user.PasswordHash = HashPassword(newPassword);
             _resetCodes.Remove(email);
 
             await _dbContext.SaveChangesAsync();

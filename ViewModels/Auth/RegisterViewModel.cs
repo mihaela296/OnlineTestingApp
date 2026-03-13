@@ -1,8 +1,8 @@
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Models.Auth;
 using OnlineTestingApp.Services;
+using OnlineTestingApp.Views.Auth;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -63,7 +63,6 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                // Используем DisplayAlertAsync вместо устаревшего DisplayAlert
                 await Shell.Current.DisplayAlert("Успешно!", result.message, "OK");
                 await Shell.Current.GoToAsync("..");
             }
@@ -79,9 +78,41 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-    private async Task GoToLoginAsync()
-    {
-        await Shell.Current.GoToAsync("//LoginPage");
-    }
+        private async Task GoToLoginAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("🔵 GoToLoginAsync вызван");
+
+                if (Shell.Current != null)
+                {
+                    await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
+                    System.Diagnostics.Debug.WriteLine("✅ Навигация через Shell выполнена");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("⚠️ Shell.Current = null, используем прямую навигацию");
+                    
+                    var loginPage = new LoginPage(
+                        new LoginViewModel(_authService)
+                    );
+                    
+                    if (Application.Current?.MainPage != null)
+                    {
+                        await Application.Current.MainPage.Navigation.PushAsync(loginPage);
+                        System.Diagnostics.Debug.WriteLine("✅ Прямая навигация выполнена");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
+                
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+                }
+            }
+        }
     }
 }

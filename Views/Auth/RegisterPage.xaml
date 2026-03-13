@@ -222,20 +222,14 @@
                     CornerRadius="24"
                     Margin="0,5,0,15"/>
 
-            <!-- Ссылка на вход -->
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
-                <Label Text="Уже есть аккаунт?" 
-                       TextColor="#4B5563"
-                       FontSize="13"/>
-                <Label Text="Войти"
-                       TextColor="#6366F1"
-                       FontSize="13"
-                       FontAttributes="Bold">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}"/>
-                    </Label.GestureRecognizers>
-                </Label>
-            </HorizontalStackLayout>
+<!-- Кнопка входа -->
+<Button Text="Уже есть аккаунт? Войти"
+        Command="{Binding GoToLoginCommand}"
+        BackgroundColor="Transparent"
+        TextColor="#6366F1"
+        FontSize="13"
+        HorizontalOptions="Center"
+        Margin="0,10,0,0"/>
             
         </VerticalStackLayout>
     </ScrollView>
