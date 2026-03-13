@@ -11,9 +11,11 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
-            <!-- Конвертеры -->
+                        <!-- Конвертеры -->
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:IsEqualConverter x:Key="IsEqualConverter"/>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+            <converters:BoolToEyeConverter x:Key="BoolToEyeConverter"/>
             
         </ResourceDictionary>
     </Application.Resources>

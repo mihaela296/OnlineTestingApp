@@ -28,14 +28,21 @@ public static class MauiProgram
         builder.Services.AddSingleton<DatabaseTestService>();
         builder.Services.AddSingleton<DeviceService>();
         builder.Services.AddSingleton<AuthService>();
+        builder.Services.AddSingleton<IEmailService, EmailService>();
 
         // ViewModels
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
+        builder.Services.AddTransient<ForgotPasswordViewModel>();
+        builder.Services.AddTransient<VerifyCodeViewModel>();
+        builder.Services.AddTransient<ResetPasswordViewModel>();
 
         // Pages
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
+        builder.Services.AddTransient<ForgotPasswordPage>();
+        builder.Services.AddTransient<VerifyCodePage>();
+        builder.Services.AddTransient<ResetPasswordPage>();
         builder.Services.AddTransient<PendingGroupPage>();
         builder.Services.AddTransient<PendingApprovalPage>();
         builder.Services.AddTransient<StudentDashboardPage>();

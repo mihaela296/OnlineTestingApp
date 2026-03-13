@@ -49,5 +49,10 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
-
+<ItemGroup>
+        <!-- XAML страницы -->
+        <MauiXaml Update="Views\Auth\ForgotPasswordPage.xaml" />
+        <MauiXaml Update="Views\Auth\VerifyCodePage.xaml" />
+        <MauiXaml Update="Views\Auth\ResetPasswordPage.xaml" />
+</ItemGroup>
 </Project>

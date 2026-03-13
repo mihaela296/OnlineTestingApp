@@ -13,11 +13,14 @@ namespace OnlineTestingApp.Services
         private readonly AppDbContext _dbContext;
         private readonly DeviceService _deviceService;
 
-        public AuthService(AppDbContext dbContext, DeviceService deviceService)
-        {
-            _dbContext = dbContext;
-            _deviceService = deviceService;
-        }
+            private readonly IEmailService _emailService;
+
+        public AuthService(AppDbContext dbContext, DeviceService deviceService, IEmailService emailService)
+{
+    _dbContext = dbContext;
+    _deviceService = deviceService;
+    _emailService = emailService;
+}
 
         private string HashPassword(string password)
         {
@@ -199,6 +202,62 @@ namespace OnlineTestingApp.Services
         {
             Preferences.Clear();
             return Task.CompletedTask;
+        }
+
+        // ============= ВОССТАНОВЛЕНИЕ ПАРОЛЯ =============
+        private static readonly Dictionary<string, (string Code, DateTime Expiry)> _resetCodes = new();
+
+        private string GenerateResetCode() => new Random().Next(100000, 999999).ToString();
+
+        public async Task<(bool success, string message)> RequestPasswordResetAsync(string email)
+        {
+            try
+            {
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+                
+                if (user == null)
+                    return (true, "Если email зарегистрирован, код будет отправлен");
+
+                var code = GenerateResetCode();
+                _resetCodes[email] = (code, DateTime.UtcNow.AddMinutes(15));
+
+                await _emailService.SendResetCodeAsync(email, code);
+
+                return (true, "Код отправлен на email");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Ошибка: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool success, string message)> VerifyResetCodeAsync(string email, string code)
+        {
+            if (_resetCodes.TryGetValue(email, out var data))
+            {
+                if (data.Expiry < DateTime.UtcNow)
+                {
+                    _resetCodes.Remove(email);
+                    return (false, "Код истёк");
+                }
+
+                if (data.Code == code)
+                    return (true, "Код подтверждён");
+            }
+            return (false, "Неверный код");
+        }
+
+        public async Task<(bool success, string message)> ResetPasswordAsync(string email, string newPassword)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null || !_resetCodes.ContainsKey(email))
+                return (false, "Ошибка");
+
+            user.PasswordHash = newPassword;
+            _resetCodes.Remove(email);
+
+            await _dbContext.SaveChangesAsync();
+            return (true, "Пароль изменён");
         }
     }
 }

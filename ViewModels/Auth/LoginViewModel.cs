@@ -5,6 +5,7 @@ using OnlineTestingApp.Models.Auth;
 using OnlineTestingApp.Services;
 using System;
 using System.Threading.Tasks;
+using OnlineTestingApp.Views.Auth;
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -132,5 +133,14 @@ namespace OnlineTestingApp.ViewModels.Auth
                     break;
             }
         }
+                [RelayCommand]
+        private async Task ForgotPasswordAsync()
+        {
+            var page = new ForgotPasswordPage(
+                new ForgotPasswordViewModel(_authService)
+            );
+            await Shell.Current.Navigation.PushAsync(page);
+        }
+
     }
 }

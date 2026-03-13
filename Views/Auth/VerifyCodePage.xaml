@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:OnlineTestingApp.Converters"
+             x:Class="OnlineTestingApp.Views.Auth.VerifyCodePage"
+             Title="Подтверждение кода"
+             BackgroundColor="White">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+            
+            <Label Text="📧" FontSize="72" HorizontalOptions="Center" Margin="0,0,0,10"/>
+            <Label Text="Проверьте почту" FontSize="28" TextColor="#111827" FontAttributes="Bold" HorizontalOptions="Center"/>
+            <Label Text="Мы отправили 6-значный код на" FontSize="14" TextColor="#4B5563" HorizontalTextAlignment="Center"/>
+            <Label Text="{Binding Email}" FontSize="16" TextColor="#6366F1" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,20"/>
+
+            <Label Text="Код из письма" TextColor="#374151" FontSize="13" Margin="0,0,0,2"/>
+            <Entry Text="{Binding Code}" Placeholder="XXXXXX" Keyboard="Numeric" MaxLength="6" BackgroundColor="#F3F4F6" TextColor="#111827" PlaceholderColor="#9CA3AF" FontSize="20" HorizontalTextAlignment="Center" HeightRequest="60" Margin="0,0,0,20"/>
+
+            <Label IsVisible="{Binding HasError}" Text="{Binding Message}" TextColor="Red" FontSize="14" HorizontalOptions="Center" Margin="0,0,0,15"/>
+
+            <Button Text="Подтвердить код" Command="{Binding VerifyCodeCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" BackgroundColor="#6366F1" TextColor="White" FontSize="15" FontAttributes="Bold" HeightRequest="48" CornerRadius="24" Margin="0,5,0,15"/>
+
+            <Button Text="← Вернуться" Command="{Binding GoBackCommand}" BackgroundColor="Transparent" TextColor="#6366F1" FontSize="14" HorizontalOptions="Center"/>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

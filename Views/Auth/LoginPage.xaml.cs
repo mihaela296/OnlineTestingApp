@@ -1,4 +1,7 @@
 using OnlineTestingApp.ViewModels.Auth;
+using OnlineTestingApp.Services;
+using OnlineTestingApp.ViewModels.Auth;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace OnlineTestingApp.Views.Auth;
 
@@ -17,17 +20,20 @@ public partial class LoginPage : ContentPage
         _isPasswordVisible = !_isPasswordVisible;
         PasswordEntry.IsPassword = !_isPasswordVisible;
         
-        var button = sender as Button;
-        if (button != null)
+        if (sender is Button button)
         {
             button.Text = _isPasswordVisible ? "👁️‍🗨️" : "👁️";
         }
     }
 
-    private async void OnForgotPasswordTapped(object sender, TappedEventArgs e)
+            private async void OnForgotPasswordButtonClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Восстановление пароля", 
-            "Функция восстановления пароля будет доступна в следующей версии", 
-            "OK");
+        var authService = App.Current?.Handler?.MauiContext?.Services.GetService<AuthService>();
+        if (authService == null) return;
+
+        var viewModel = new ForgotPasswordViewModel(authService);
+        var page = new ForgotPasswordPage(viewModel);
+        
+        await Navigation.PushAsync(page);
     }
 }

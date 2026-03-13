@@ -17,5 +17,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("AdminDashboardPage", typeof(AdminDashboardPage));
         Routing.RegisterRoute("PendingGroupPage", typeof(PendingGroupPage));
         Routing.RegisterRoute("PendingApprovalPage", typeof(PendingApprovalPage));
+        Routing.RegisterRoute("ForgotPasswordPage", typeof(ForgotPasswordPage));
+       
     }
 }
