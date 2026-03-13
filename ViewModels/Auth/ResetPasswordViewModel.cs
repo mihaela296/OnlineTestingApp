@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Services;
+using OnlineTestingApp.Views.Auth;
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -68,6 +69,7 @@ namespace OnlineTestingApp.ViewModels.Auth
             {
                 IsBusy = true;
                 HasError = false;
+                IsSuccess = false;
 
                 var result = await _authService.ResetPasswordAsync(Email, NewPassword);
 
@@ -77,7 +79,11 @@ namespace OnlineTestingApp.ViewModels.Auth
                     IsSuccess = true;
                     
                     await Task.Delay(2000);
-                    await Shell.Current.GoToAsync("///LoginPage");
+                    
+                    var loginPage = new LoginPage(
+                        new LoginViewModel(_authService)
+                    );
+                    await Application.Current.MainPage.Navigation.PushAsync(loginPage);
                 }
                 else
                 {

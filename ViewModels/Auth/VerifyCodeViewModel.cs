@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Services;
+using OnlineTestingApp.Views.Auth;
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -44,16 +45,21 @@ namespace OnlineTestingApp.ViewModels.Auth
                 IsBusy = true;
                 HasError = false;
 
+                System.Diagnostics.Debug.WriteLine($"🔵 Проверка кода: Email={Email}, Code={Code}");
+                
                 var result = await _authService.VerifyResetCodeAsync(Email, Code);
+
+                System.Diagnostics.Debug.WriteLine($"✅ Результат: success={result.success}, message={result.message}");
 
                 if (result.success)
                 {
-                    var parameters = new Dictionary<string, object>
-                    {
-                        { "email", Email },
-                        { "code", Code }
-                    };
-                    await Shell.Current.GoToAsync("ResetPasswordPage", parameters);
+                    var resetPasswordVM = new ResetPasswordViewModel(_authService);
+                    resetPasswordVM.Email = Email;
+                    resetPasswordVM.Code = Code;
+                    
+                    var resetPasswordPage = new ResetPasswordPage(resetPasswordVM);
+                    
+                    await Application.Current.MainPage.Navigation.PushAsync(resetPasswordPage);
                 }
                 else
                 {
@@ -63,8 +69,14 @@ namespace OnlineTestingApp.ViewModels.Auth
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
                 Message = $"Ошибка: {ex.Message}";
                 HasError = true;
+                
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+                }
             }
             finally
             {
@@ -75,7 +87,7 @@ namespace OnlineTestingApp.ViewModels.Auth
         [RelayCommand]
         private async Task GoBackAsync()
         {
-            await Shell.Current.GoToAsync("..");
+            await Application.Current.MainPage.Navigation.PopAsync();
         }
     }
 }

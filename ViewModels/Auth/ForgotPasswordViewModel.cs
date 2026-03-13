@@ -30,47 +30,52 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-        private async Task SendResetCodeAsync()
+private async Task SendResetCodeAsync()
+{
+    if (IsBusy || string.IsNullOrWhiteSpace(Email))
+        return;
+
+    try
+    {
+        IsBusy = true;
+        HasMessage = false;
+
+        System.Diagnostics.Debug.WriteLine($"🔵 Отправка кода для email: {Email}");
+        
+        var result = await _authService.RequestPasswordResetAsync(Email);
+
+        System.Diagnostics.Debug.WriteLine($"✅ Результат: success={result.success}, message={result.message}");
+
+        Message = result.message;
+        IsSuccess = result.success;
+        HasMessage = true;
+
+        if (result.success)
         {
-            if (IsBusy || string.IsNullOrWhiteSpace(Email))
-                return;
-
-            try
-            {
-                IsBusy = true;
-                HasMessage = false;
-
-                System.Diagnostics.Debug.WriteLine($"🔵 Отправка кода для email: {Email}");
-                
-                var result = await _authService.RequestPasswordResetAsync(Email);
-
-                System.Diagnostics.Debug.WriteLine($"✅ Результат: success={result.success}, message={result.message}");
-
-                Message = result.message;
-                IsSuccess = result.success;
-                HasMessage = true;
-
-                if (result.success)
-                {
-                    var parameters = new Dictionary<string, object>
-                    {
-                        { "email", Email }
-                    };
-                    await Shell.Current.GoToAsync("VerifyCodePage", parameters);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"❌ Исключение: {ex.Message}");
-                Message = $"Ошибка: {ex.Message}";
-                IsSuccess = false;
-                HasMessage = true;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            // Используем прямую навигацию вместо Shell
+            var verifyCodePage = new VerifyCodePage(
+                new VerifyCodeViewModel(_authService)
+            );
+            
+            // Передаем email через параметры
+            verifyCodePage.BindingContext = new VerifyCodeViewModel(_authService);
+            ((VerifyCodeViewModel)verifyCodePage.BindingContext).Email = Email;
+            
+            await Application.Current.MainPage.Navigation.PushAsync(verifyCodePage);
         }
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"❌ Исключение: {ex.Message}");
+        Message = $"Ошибка: {ex.Message}";
+        IsSuccess = false;
+        HasMessage = true;
+    }
+    finally
+    {
+        IsBusy = false;
+    }
+}
 
         [RelayCommand]
         private async Task GoBackAsync()
