@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Services;
+using OnlineTestingApp.Views.Auth;
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -28,7 +29,7 @@ namespace OnlineTestingApp.ViewModels.Auth
             _authService = authService;
         }
 
-                [RelayCommand]
+        [RelayCommand]
         private async Task SendResetCodeAsync()
         {
             if (IsBusy || string.IsNullOrWhiteSpace(Email))
@@ -74,7 +75,29 @@ namespace OnlineTestingApp.ViewModels.Auth
         [RelayCommand]
         private async Task GoBackAsync()
         {
-            await Shell.Current.GoToAsync("//LoginPage");
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("🔵 GoBackAsync вызван");
+
+                var loginPage = new LoginPage(
+                    new LoginViewModel(_authService)
+                );
+                
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.Navigation.PushAsync(loginPage);
+                    System.Diagnostics.Debug.WriteLine("✅ Прямая навигация выполнена");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
+                
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+                }
+            }
         }
     }
 }
