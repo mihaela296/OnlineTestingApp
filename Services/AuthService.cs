@@ -40,7 +40,8 @@ namespace OnlineTestingApp.Services
                 if (user == null)
                     return (false, "Пользователь не найден", null);
 
-                if (user.PasswordHash != model.Password)
+                // Сравниваем хэш пароля
+                if (user.PasswordHash != HashPassword(model.Password))
                     return (false, "Неверный пароль", null);
 
                 if (!user.IsActive)
@@ -216,7 +217,6 @@ namespace OnlineTestingApp.Services
                 if (user == null)
                     return (true, "Если email зарегистрирован, код будет отправлен");
 
-                // Проверка почтового сервиса
                 if (_emailService == null)
                     return (false, "Ошибка конфигурации почтового сервиса");
 
@@ -255,12 +255,17 @@ namespace OnlineTestingApp.Services
             if (user == null || !_resetCodes.ContainsKey(email))
                 return (false, "Ошибка");
 
-            // Хэшируем новый пароль
             user.PasswordHash = HashPassword(newPassword);
             _resetCodes.Remove(email);
 
             await _dbContext.SaveChangesAsync();
             return (true, "Пароль изменён");
         }
+        public async Task<User?> GetUserWithRoleAsync(int userId)
+{
+    return await _dbContext.Users
+        .Include(u => u.Role)
+        .FirstOrDefaultAsync(u => u.UserId == userId);
+}
     }
 }
