@@ -29,46 +29,46 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(bool success, string message, User? user)> LoginAsync(LoginModel model)
+{
+    try
+    {
+        var user = await _dbContext.Users
+            .Include(u => u.Role)
+            .Include(u => u.Profile)
+            .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        if (user == null)
+            return (false, "Пользователь не найден", null);
+
+        if (user.PasswordHash != HashPassword(model.Password))
+            return (false, "Неверный пароль", null);
+
+        // ❌ Убираем проверку IsActive отсюда
+        // if (!user.IsActive)
+        //     return (false, "Ваш аккаунт деактивирован. Обратитесь к администратору.", null);
+
+        user.LastLoginDate = DateTime.UtcNow;
+        
+        await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
+        await _dbContext.SaveChangesAsync();
+
+        var userJson = JsonSerializer.Serialize(new
         {
-            try
-            {
-                var user = await _dbContext.Users
-                    .Include(u => u.Role)
-                    .Include(u => u.Profile)
-                    .FirstOrDefaultAsync(u => u.Email == model.Email);
+            user.UserId,
+            user.Email,
+            user.Username,
+            Role = user.Role?.RoleName,
+            user.IsActive
+        });
+        Preferences.Set("current_user", userJson);
 
-                if (user == null)
-                    return (false, "Пользователь не найден", null);
-
-                // Сравниваем хэш пароля
-                if (user.PasswordHash != HashPassword(model.Password))
-                    return (false, "Неверный пароль", null);
-
-                if (!user.IsActive)
-                    return (false, "Ваш аккаунт деактивирован. Обратитесь к администратору.", null);
-
-                user.LastLoginDate = DateTime.UtcNow;
-                
-                await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
-                await _dbContext.SaveChangesAsync();
-
-                var userJson = JsonSerializer.Serialize(new
-                {
-                    user.UserId,
-                    user.Email,
-                    user.Username,
-                    Role = user.Role?.RoleName,
-                    user.IsActive
-                });
-                Preferences.Set("current_user", userJson);
-
-                return (true, "Успешный вход", user);
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Ошибка входа: {ex.Message}", null);
-            }
-        }
+        return (true, "Успешный вход", user);
+    }
+    catch (Exception ex)
+    {
+        return (false, $"Ошибка входа: {ex.Message}", null);
+    }
+}
 
         public async Task<(bool success, string message, User? user)> RegisterAsync(RegisterModel model)
         {
@@ -166,36 +166,35 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(string status, string message)> GetUserStatusAsync(int userId)
+{
+    var user = await _dbContext.Users
+        .Include(u => u.Role)
+        .FirstOrDefaultAsync(u => u.UserId == userId);
+
+    if (user == null)
+        return ("not_found", "Пользователь не найден");
+
+    if (!user.IsActive)
+    {
+        // Если пользователь неактивен и это Teacher или Admin
+        if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
         {
-            var user = await _dbContext.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null)
-                return ("not_found", "Пользователь не найден");
-
-            if (!user.IsActive)
-                return ("inactive", "Ваш аккаунт деактивирован");
-
-            if (user.Role?.RoleName == "Student")
-            {
-                var hasGroups = await _dbContext.UserGroups
-                    .AnyAsync(ug => ug.UserId == userId);
-                
-                if (!hasGroups)
-                    return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
-            }
-
-            if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
-            {
-                if (user.IsActive)
-                    return ("active", "Аккаунт подтвержден");
-                else
-                    return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
-            }
-
-            return ("active", "Аккаунт активен");
+            return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
         }
+        return ("inactive", "Ваш аккаунт деактивирован");
+    }
+
+    if (user.Role?.RoleName == "Student")
+    {
+        var hasGroups = await _dbContext.UserGroups
+            .AnyAsync(ug => ug.UserId == userId);
+        
+        if (!hasGroups)
+            return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
+    }
+
+    return ("active", "Аккаунт активен");
+}
 
         public Task LogoutAsync()
         {
@@ -203,9 +202,7 @@ namespace OnlineTestingApp.Services
             return Task.CompletedTask;
         }
 
-        // ============= ВОССТАНОВЛЕНИЕ ПАРОЛЯ =============
         private static readonly Dictionary<string, (string Code, DateTime Expiry)> _resetCodes = new();
-
         private string GenerateResetCode() => new Random().Next(100000, 999999).ToString();
 
         public async Task<(bool success, string message)> RequestPasswordResetAsync(string email)
@@ -261,11 +258,12 @@ namespace OnlineTestingApp.Services
             await _dbContext.SaveChangesAsync();
             return (true, "Пароль изменён");
         }
+
         public async Task<User?> GetUserWithRoleAsync(int userId)
-{
-    return await _dbContext.Users
-        .Include(u => u.Role)
-        .FirstOrDefaultAsync(u => u.UserId == userId);
-}
+        {
+            return await _dbContext.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
     }
 }

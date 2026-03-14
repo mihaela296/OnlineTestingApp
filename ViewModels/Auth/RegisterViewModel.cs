@@ -63,8 +63,13 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                await Shell.Current.DisplayAlert("Успешно!", result.message, "OK");
-                await Shell.Current.GoToAsync("..");
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Успешно!", result.message, "OK");
+                    
+                    var loginPage = new LoginPage(new LoginViewModel(_authService));
+                    await Application.Current.MainPage.Navigation.PushAsync(loginPage);
+                }
             }
             catch (System.Exception ex)
             {
@@ -82,32 +87,15 @@ namespace OnlineTestingApp.ViewModels.Auth
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("🔵 GoToLoginAsync вызван");
-
-                if (Shell.Current != null)
+                var loginPage = new LoginPage(new LoginViewModel(_authService));
+                
+                if (Application.Current?.MainPage != null)
                 {
-                    await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
-                    System.Diagnostics.Debug.WriteLine("✅ Навигация через Shell выполнена");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("⚠️ Shell.Current = null, используем прямую навигацию");
-                    
-                    var loginPage = new LoginPage(
-                        new LoginViewModel(_authService)
-                    );
-                    
-                    if (Application.Current?.MainPage != null)
-                    {
-                        await Application.Current.MainPage.Navigation.PushAsync(loginPage);
-                        System.Diagnostics.Debug.WriteLine("✅ Прямая навигация выполнена");
-                    }
+                    await Application.Current.MainPage.Navigation.PushAsync(loginPage);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
-                
                 if (Application.Current?.MainPage != null)
                 {
                     await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");

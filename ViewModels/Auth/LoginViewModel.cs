@@ -77,23 +77,22 @@ namespace OnlineTestingApp.ViewModels.Auth
             }
         }
 
-[RelayCommand]
-private async Task GoToRegisterAsync()
-{
-    try
-    {
-        var registerPage = new RegisterPage(
-            new RegisterViewModel(_authService)
-        );
-        await Application.Current.MainPage.Navigation.PushAsync(registerPage);
-        System.Diagnostics.Debug.WriteLine("✅ Переход на RegisterPage выполнен");
-    }
-    catch (Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"❌ Ошибка: {ex.Message}");
-        await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
-    }
-}
+        [RelayCommand]
+        private async Task GoToRegisterAsync()
+        {
+            try
+            {
+                var registerPage = new RegisterPage(
+                    new RegisterViewModel(_authService)
+                );
+                await Application.Current.MainPage.Navigation.PushAsync(registerPage);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+            }
+        }
+
         [RelayCommand]
         private void TogglePasswordVisibility()
         {
@@ -101,62 +100,62 @@ private async Task GoToRegisterAsync()
         }
 
         [RelayCommand]
-private async Task ForgotPasswordAsync()
-{
-    var page = new ForgotPasswordPage(
-        new ForgotPasswordViewModel(_authService)
-    );
-    await Application.Current.MainPage.Navigation.PushAsync(page);
-}
+        private async Task ForgotPasswordAsync()
+        {
+            var page = new ForgotPasswordPage(
+                new ForgotPasswordViewModel(_authService)
+            );
+            await Application.Current.MainPage.Navigation.PushAsync(page);
+        }
 
         private async Task NavigateBasedOnRole(User? user)
-{
-    if (user == null)
-    {
-        await Shell.Current.GoToAsync("LoginPage");
-        return;
-    }
-
-    var status = await _authService.GetUserStatusAsync(user.UserId);
-    
-    switch (status.status)
-    {
-        case "pending_group":
-            var pendingGroupPage = new PendingGroupPage();
-            await Application.Current.MainPage.Navigation.PushAsync(pendingGroupPage);
-            break;
-            
-        case "pending_approval":
-            var pendingApprovalPage = new PendingApprovalPage();
-            await Application.Current.MainPage.Navigation.PushAsync(pendingApprovalPage);
-            break;
-            
-        case "active":
-            switch (user.Role?.RoleName)
+        {
+            if (user == null)
             {
-                case "Student":
-                    var studentPage = new StudentDashboardPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(studentPage);
+                await Shell.Current.GoToAsync("LoginPage");
+                return;
+            }
+
+            var status = await _authService.GetUserStatusAsync(user.UserId);
+            
+            switch (status.status)
+            {
+                case "pending_group":
+                    var pendingGroupPage = new PendingGroupPage();
+                    await Application.Current.MainPage.Navigation.PushAsync(pendingGroupPage);
                     break;
-                case "Teacher":
-                    var teacherPage = new TeacherDashboardPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(teacherPage);
+                    
+                case "pending_approval":
+                    var pendingApprovalPage = new PendingApprovalPage();
+                    await Application.Current.MainPage.Navigation.PushAsync(pendingApprovalPage);
                     break;
-                case "Admin":
-                    var adminPage = new AdminDashboardPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(adminPage);
+                    
+                case "active":
+                    switch (user.Role?.RoleName)
+                    {
+                        case "Student":
+                            var studentPage = new StudentDashboardPage();
+                            await Application.Current.MainPage.Navigation.PushAsync(studentPage);
+                            break;
+                        case "Teacher":
+                            var teacherPage = new TeacherDashboardPage();
+                            await Application.Current.MainPage.Navigation.PushAsync(teacherPage);
+                            break;
+                        case "Admin":
+                            var adminPage = new AdminDashboardPage();
+                            await Application.Current.MainPage.Navigation.PushAsync(adminPage);
+                            break;
+                        default:
+                            var defaultPage = new StudentDashboardPage();
+                            await Application.Current.MainPage.Navigation.PushAsync(defaultPage);
+                            break;
+                    }
                     break;
+                    
                 default:
-                    var defaultPage = new StudentDashboardPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(defaultPage);
+                    await Shell.Current.GoToAsync("LoginPage");
                     break;
             }
-            break;
-            
-        default:
-            await Shell.Current.GoToAsync("LoginPage");
-            break;
-    }
-}
+        }
     }
 }
