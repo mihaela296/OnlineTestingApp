@@ -1,3 +1,6 @@
+using OnlineTestingApp.Services;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace OnlineTestingApp;
 
 public partial class App : Application

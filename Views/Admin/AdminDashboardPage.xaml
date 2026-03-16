@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OnlineTestingApp.Views.Admin.AdminDashboardPage"
+             Title="Панель администратора"
+             BackgroundColor="{StaticResource Background}">
+    
+    <Grid>
+        <Grid Background="{StaticResource SurfaceGradient}"/>
+        
+        <ScrollView>
+            <VerticalStackLayout Spacing="25" Padding="25">
+                
+                <!-- Приветствие -->
+                <Label Text="👑 Панель администратора" 
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource Primary}"
+                       HorizontalOptions="Center"/>
+                
+                <!-- Статистика -->
+                <Grid ColumnSpacing="15" RowSpacing="15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Карточки статистики -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource StatsCardStyle}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="👥" FontSize="32"/>
+                            <Label Text="{Binding TotalUsers}" FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Всего пользователей" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatsCardStyle}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="⏳" FontSize="32"/>
+                            <Label Text="{Binding PendingTeachers}" FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Ожидают" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource StatsCardStyle}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="📚" FontSize="32"/>
+                            <Label Text="{Binding TotalTests}" FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Всего тестов" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatsCardStyle}">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="👨‍🏫" FontSize="32"/>
+                            <Label Text="{Binding TotalTeachers}" FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Учителей" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+                
+                <!-- Меню управления -->
+                <Label Text="Управление" 
+                       FontSize="18" 
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       Margin="0,10,0,5"/>
+                
+                <!-- Кнопки управления -->
+                <Border Style="{StaticResource MenuCardStyle}">
+                    <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
+                        <Label Grid.Column="0" Text="👥" FontSize="24" Margin="0,0,15,0"/>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Пользователи" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Управление, подтверждение учителей" 
+                                   FontSize="12" 
+                                   TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" 
+                                Text="→"
+                                Command="{Binding GoToUserManagementCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="24"
+                                Padding="10,0"/>
+                    </Grid>
+                </Border>
+                
+                <Border Style="{StaticResource MenuCardStyle}">
+                    <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
+                        <Label Grid.Column="0" Text="👥" FontSize="24" Margin="0,0,15,0"/>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Группы" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Создание и управление группами" 
+                                   FontSize="12" 
+                                   TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" 
+                                Text="→"
+                                Command="{Binding GoToGroupManagementCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="24"
+                                Padding="10,0"/>
+                    </Grid>
+                </Border>
+                
+                <Border Style="{StaticResource MenuCardStyle}">
+                    <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
+                        <Label Grid.Column="0" Text="📋" FontSize="24" Margin="0,0,15,0"/>
+                        <VerticalStackLayout Grid.Column="1">
+                            <Label Text="Логи системы" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Просмотр действий пользователей" 
+                                   FontSize="12" 
+                                   TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" 
+                                Text="→"
+                                Command="{Binding GoToLogsCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="24"
+                                Padding="10,0"/>
+                    </Grid>
+                </Border>
+                
+                <!-- Кнопка выхода -->
+                <Button Text="Выйти из аккаунта"
+                        Command="{Binding LogoutCommand}"
+                        BackgroundColor="{StaticResource Error}"
+                        TextColor="White"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="24"
+                        Margin="0,20,0,0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

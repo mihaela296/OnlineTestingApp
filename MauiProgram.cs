@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using OnlineTestingApp.Data;
 using OnlineTestingApp.Services;
 using OnlineTestingApp.ViewModels.Auth;
+using OnlineTestingApp.ViewModels.Admin;
 using OnlineTestingApp.Views;
 using OnlineTestingApp.Views.Auth;
+using OnlineTestingApp.Views.Admin;
+using CommunityToolkit.Maui; // Добавь эту строку
 
 namespace OnlineTestingApp;
 
@@ -14,6 +17,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit() // Добавлено для поддержки toolkit
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -30,14 +34,19 @@ public static class MauiProgram
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddSingleton<IEmailService, EmailService>();
 
-        // ViewModels
+        // Auth ViewModels
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<RegisterViewModel>();
         builder.Services.AddTransient<ForgotPasswordViewModel>();
         builder.Services.AddTransient<VerifyCodeViewModel>();
         builder.Services.AddTransient<ResetPasswordViewModel>();
 
-        // Pages
+        // Admin ViewModels
+        builder.Services.AddTransient<AdminDashboardViewModel>();
+        builder.Services.AddTransient<UserManagementViewModel>();
+        builder.Services.AddTransient<PendingTeachersViewModel>();
+
+        // Auth Pages
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
         builder.Services.AddTransient<ForgotPasswordPage>();
@@ -47,8 +56,12 @@ public static class MauiProgram
         builder.Services.AddTransient<PendingApprovalPage>();
         builder.Services.AddTransient<StudentDashboardPage>();
         builder.Services.AddTransient<TeacherDashboardPage>();
-        builder.Services.AddTransient<AdminDashboardPage>();
         builder.Services.AddTransient<TestDbPage>();
+
+        // Admin Pages
+        builder.Services.AddTransient<AdminDashboardPage>();
+        builder.Services.AddTransient<UserManagementPage>();
+        builder.Services.AddTransient<PendingTeachersPage>();
 
         return builder.Build();
     }

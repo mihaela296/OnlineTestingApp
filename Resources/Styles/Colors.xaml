@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -15,10 +15,11 @@
     <Color x:Key="Surface">#FFFFFF</Color>
     <Color x:Key="SurfaceVariant">#F3F4F6</Color>
     
-    <!-- Текст - ЯРКИЕ И ВИДИМЫЕ ЦВЕТА -->
-    <Color x:Key="Text">#000000</Color>           <!-- Чисто черный -->
-    <Color x:Key="TextSecondary">#1F2937</Color>   <!-- Темно-серый -->
-    <Color x:Key="TextLight">#4B5563</Color>       <!-- Серый -->
+    <!-- Текст -->
+    <Color x:Key="TextPrimary">#111827</Color>     <!-- Добавлено! -->
+    <Color x:Key="Text">#111827</Color>            <!-- Почти черный -->
+    <Color x:Key="TextSecondary">#374151</Color>   <!-- Темно-серый -->
+    <Color x:Key="TextLight">#6B7280</Color>       <!-- Серый -->
     
     <!-- Состояния -->
     <Color x:Key="Success">#10B981</Color>

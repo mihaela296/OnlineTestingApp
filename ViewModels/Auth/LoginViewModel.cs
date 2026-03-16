@@ -7,6 +7,9 @@ using System;
 using System.Threading.Tasks;
 using OnlineTestingApp.Views;
 using OnlineTestingApp.Views.Auth;
+using OnlineTestingApp.Views.Admin;
+using OnlineTestingApp.ViewModels.Admin; // Добавлено для AdminDashboardViewModel
+using OnlineTestingApp.Data; // Добавлено для AppDbContext
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -85,11 +88,16 @@ namespace OnlineTestingApp.ViewModels.Auth
                 var registerPage = new RegisterPage(
                     new RegisterViewModel(_authService)
                 );
-                await Application.Current.MainPage.Navigation.PushAsync(registerPage);
+                
+                var window = GetCurrentWindow();
+                if (window?.Page != null)
+                {
+                    await window.Page.Navigation.PushAsync(registerPage);
+                }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
             }
         }
 
@@ -105,7 +113,12 @@ namespace OnlineTestingApp.ViewModels.Auth
             var page = new ForgotPasswordPage(
                 new ForgotPasswordViewModel(_authService)
             );
-            await Application.Current.MainPage.Navigation.PushAsync(page);
+            
+            var window = GetCurrentWindow();
+            if (window?.Page != null)
+            {
+                await window.Page.Navigation.PushAsync(page);
+            }
         }
 
         private async Task NavigateBasedOnRole(User? user)
@@ -118,16 +131,19 @@ namespace OnlineTestingApp.ViewModels.Auth
 
             var status = await _authService.GetUserStatusAsync(user.UserId);
             
+            var window = GetCurrentWindow();
+            if (window?.Page == null) return;
+            
             switch (status.status)
             {
                 case "pending_group":
                     var pendingGroupPage = new PendingGroupPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(pendingGroupPage);
+                    await window.Page.Navigation.PushAsync(pendingGroupPage);
                     break;
                     
                 case "pending_approval":
                     var pendingApprovalPage = new PendingApprovalPage();
-                    await Application.Current.MainPage.Navigation.PushAsync(pendingApprovalPage);
+                    await window.Page.Navigation.PushAsync(pendingApprovalPage);
                     break;
                     
                 case "active":
@@ -135,19 +151,25 @@ namespace OnlineTestingApp.ViewModels.Auth
                     {
                         case "Student":
                             var studentPage = new StudentDashboardPage();
-                            await Application.Current.MainPage.Navigation.PushAsync(studentPage);
+                            await window.Page.Navigation.PushAsync(studentPage);
                             break;
                         case "Teacher":
                             var teacherPage = new TeacherDashboardPage();
-                            await Application.Current.MainPage.Navigation.PushAsync(teacherPage);
+                            await window.Page.Navigation.PushAsync(teacherPage);
                             break;
                         case "Admin":
-                            var adminPage = new AdminDashboardPage();
-                            await Application.Current.MainPage.Navigation.PushAsync(adminPage);
+                            // Используем полное имя с пространством имён
+                            var dbContext = App.Current?.Handler?.MauiContext?.Services.GetService<AppDbContext>();
+                            if (dbContext != null)
+                            {
+                                var adminVM = new AdminDashboardViewModel(dbContext, _authService);
+                                var adminPage = new OnlineTestingApp.Views.Admin.AdminDashboardPage(adminVM);
+                                await window.Page.Navigation.PushAsync(adminPage);
+                            }
                             break;
                         default:
                             var defaultPage = new StudentDashboardPage();
-                            await Application.Current.MainPage.Navigation.PushAsync(defaultPage);
+                            await window.Page.Navigation.PushAsync(defaultPage);
                             break;
                     }
                     break;
@@ -155,6 +177,21 @@ namespace OnlineTestingApp.ViewModels.Auth
                 default:
                     await Shell.Current.GoToAsync("LoginPage");
                     break;
+            }
+        }
+
+        // Вспомогательные методы для работы с устаревшим API
+        private Window? GetCurrentWindow()
+        {
+            return Application.Current?.Windows.FirstOrDefault();
+        }
+
+        private async Task ShowAlertAsync(string title, string message)
+        {
+            var window = GetCurrentWindow();
+            if (window?.Page != null)
+            {
+                await window.Page.DisplayAlert(title, message, "OK");
             }
         }
     }

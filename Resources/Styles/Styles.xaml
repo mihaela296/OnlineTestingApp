@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
@@ -24,7 +23,7 @@
         <Setter Property="HorizontalOptions" Value="Center"/>
     </Style>
 
-    <!-- Стили для Entry - ИСПРАВЛЕНО -->
+    <!-- Стили для Entry -->
     <Style x:Key="ModernEntry" TargetType="Entry">
         <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
         <Setter Property="TextColor" Value="{StaticResource Text}"/>
@@ -121,6 +120,21 @@
         <Setter Property="WidthRequest" Value="48"/>
         <Setter Property="HeightRequest" Value="48"/>
         <Setter Property="IsRunning" Value="True"/>
+    </Style>
+
+    <!-- Стили для админки -->
+    <Style x:Key="StatsCardStyle" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
+        <Setter Property="Stroke" Value="#E5E7EB"/>
+        <Setter Property="Padding" Value="15"/>
+        <Setter Property="BackgroundColor" Value="#F9FAFB"/>
+    </Style>
+
+    <Style x:Key="MenuCardStyle" TargetType="Border">
+        <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
+        <Setter Property="Stroke" Value="#E5E7EB"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BackgroundColor" Value="White"/>
     </Style>
 
 </ResourceDictionary>
