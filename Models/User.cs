@@ -27,5 +27,6 @@ namespace OnlineTestingApp.Models
         public ICollection<Message> SentMessages { get; set; } = new List<Message>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
+        public ICollection<UserAnswer>? UserAnswers { get; set; }
     }
 }

@@ -1,4 +1,3 @@
-// ViewModels/Admin/UserManagementViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -42,10 +41,8 @@ namespace OnlineTestingApp.ViewModels.Admin
                     .Include(u => u.Profile)
                     .AsQueryable();
 
-                // Применяем фильтр
                 query = ApplyFilter(query);
 
-                // Применяем поиск
                 if (!string.IsNullOrWhiteSpace(SearchText))
                 {
                     var search = SearchText.ToLower();
@@ -75,14 +72,13 @@ namespace OnlineTestingApp.ViewModels.Admin
                         LastName = user.Profile?.LastName,
                         IsActive = user.IsActive,
                         CreatedAt = user.CreatedAt,
-                        LastLoginDate = user.LastLoginDate,
-                        Status = GetUserStatus(user)
+                        Status = user.IsActive ? "Активен" : "Заблокирован"
                     });
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", $"Не удалось загрузить пользователей: {ex.Message}", "OK");
+                await ShowAlertAsync("Ошибка", $"Не удалось загрузить пользователей: {ex.Message}");
             }
             finally
             {
@@ -116,33 +112,35 @@ namespace OnlineTestingApp.ViewModels.Admin
             };
         }
 
-        private string GetUserStatus(User user)
-        {
-            if (!user.IsActive && user.Role?.RoleName == "Teacher")
-                return "Ожидает";
-            if (!user.IsActive)
-                return "Заблокирован";
-            return "Активен";
-        }
-
         [RelayCommand]
         public async Task ToggleStatusAsync(int userId)
         {
             try
             {
+                if (userId <= 0)
+                {
+                    await ShowAlertAsync("Ошибка", "Некорректный ID пользователя");
+                    return;
+                }
+
                 var user = await _dbContext.Users.FindAsync(userId);
-                if (user == null) return;
+                if (user == null) 
+                {
+                    await ShowAlertAsync("Ошибка", "Пользователь не найден");
+                    return;
+                }
 
                 user.IsActive = !user.IsActive;
                 await _dbContext.SaveChangesAsync();
+                
                 await LoadUsersAsync();
-
-                var message = user.IsActive ? "Пользователь активирован" : "Пользователь деактивирован";
-                await Shell.Current.DisplayAlert("Успех", message, "OK");
+                
+                string status = user.IsActive ? "активирован" : "деактивирован";
+                await ShowAlertAsync("Успех", $"✅ Пользователь {user.Username ?? "Пользователь"} {status}");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
             }
         }
 
@@ -151,38 +149,121 @@ namespace OnlineTestingApp.ViewModels.Admin
         {
             try
             {
-                var accept = await Shell.Current.DisplayAlert(
-                    "Подтверждение",
-                    "Вы уверены, что хотите удалить пользователя? Это действие нельзя отменить.",
-                    "Да", "Нет");
+                if (userId <= 0)
+                {
+                    await ShowAlertAsync("Ошибка", "Некорректный ID пользователя");
+                    return;
+                }
+
+                var user = await _dbContext.Users
+                    .Include(u => u.Profile)
+                    .Include(u => u.Logs)
+                    .Include(u => u.Notifications)
+                    .Include(u => u.Devices)
+                    .Include(u => u.UserGroups)
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+                if (user == null) 
+                {
+                    await ShowAlertAsync("Ошибка", "Пользователь не найден");
+                    return;
+                }
+
+                var window = Application.Current?.Windows.FirstOrDefault();
+                if (window?.Page == null) return;
+
+                var accept = await window.Page.DisplayAlert(
+                    "Подтверждение удаления",
+                    $"Вы уверены, что хотите удалить пользователя {user.Username ?? "Пользователь"}?",
+                    "Да",
+                    "Нет");
 
                 if (!accept) return;
 
-                var user = await _dbContext.Users.FindAsync(userId);
-                if (user == null) return;
+                IsBusy = true;
 
-                _dbContext.Users.Remove(user);
-                await _dbContext.SaveChangesAsync();
-                await LoadUsersAsync();
+                using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
-                await Shell.Current.DisplayAlert("Успех", "Пользователь удалён", "OK");
+                try
+                {
+                    if (user.Logs?.Any() == true)
+                        _dbContext.Logs.RemoveRange(user.Logs);
+
+                    if (user.Notifications?.Any() == true)
+                        _dbContext.Notifications.RemoveRange(user.Notifications);
+
+                    if (user.Devices?.Any() == true)
+                        _dbContext.Devices.RemoveRange(user.Devices);
+
+                    if (user.UserGroups?.Any() == true)
+                        _dbContext.UserGroups.RemoveRange(user.UserGroups);
+
+                    if (user.Profile != null)
+                        _dbContext.Profiles.Remove(user.Profile);
+
+                    _dbContext.Users.Remove(user);
+                    
+                    await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    
+                    await LoadUsersAsync();
+                    await ShowAlertAsync("Успех", $"✅ Пользователь {user.Username} успешно удалён");
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", $"Не удалось удалить пользователя: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task ShowAlertAsync(string title, string message)
+        {
+            var window = Application.Current?.Windows.FirstOrDefault();
+            if (window?.Page != null)
+            {
+                await window.Page.DisplayAlert(title, message, "OK");
             }
         }
 
         [RelayCommand]
         private async Task CreateUserAsync()
         {
-            await Shell.Current.DisplayAlert("Инфо", "Создание пользователя в разработке", "OK");
+            await ShowAlertAsync("Инфо", "Создание пользователя в разработке");
         }
 
         [RelayCommand]
         private async Task EditAsync(int userId)
         {
-            await Shell.Current.DisplayAlert("Инфо", $"Редактирование пользователя {userId} в разработке", "OK");
+            try
+            {
+                if (userId <= 0)
+                {
+                    await ShowAlertAsync("Ошибка", "Некорректный ID пользователя");
+                    return;
+                }
+
+                var user = Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null)
+                {
+                    await ShowAlertAsync("Ошибка", "Пользователь не найден");
+                    return;
+                }
+
+                await ShowAlertAsync("Инфо", $"Редактирование пользователя {user.Username ?? "Пользователь"} в разработке");
+            }
+            catch (Exception ex)
+            {
+                await ShowAlertAsync("Ошибка", ex.Message);
+            }
         }
     }
 
@@ -197,7 +278,6 @@ namespace OnlineTestingApp.ViewModels.Admin
         public string FullName => $"{FirstName} {LastName}".Trim();
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? LastLoginDate { get; set; }
         public string Status { get; set; } = string.Empty;
         
         public string RoleColor => Role switch
@@ -207,5 +287,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             "Student" => "#10B981",
             _ => "#6B7280"
         };
+        
+        public string StatusIcon => IsActive ? "🔓" : "🔒";
     }
 }
