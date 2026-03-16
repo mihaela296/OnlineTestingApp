@@ -58,7 +58,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
             }
             finally
             {
@@ -75,43 +75,128 @@ namespace OnlineTestingApp.ViewModels.Admin
                 if (user == null) return;
 
                 user.IsActive = true;
+                
+                _dbContext.Logs.Add(new Log
+                {
+                    UserId = userId,
+                    Action = "TeacherApproved",
+                    Timestamp = DateTime.UtcNow,
+                    Details = "Учитель подтверждён администратором"
+                });
+
                 await _dbContext.SaveChangesAsync();
                 await LoadPendingTeachersAsync();
 
-                await Shell.Current.DisplayAlert("Успех", "Учитель подтверждён", "OK");
+                await ShowAlertAsync("Успех", "✅ Учитель подтверждён");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
             }
         }
 
         [RelayCommand]
-        public async Task RejectAsync(int userId)
+public async Task RejectAsync(int userId)
+{
+    try
+    {
+        var accept = await ShowConfirmAsync(
+            "Подтверждение",
+            "Вы уверены, что хотите отклонить заявку учителя?");
+
+        if (!accept) return;
+
+        IsBusy = true;
+
+        // Загружаем учителя со всеми связанными данными
+        var user = await _dbContext.Users
+            .Include(u => u.Profile)
+            .Include(u => u.Logs)
+            .Include(u => u.Notifications)
+            .Include(u => u.Devices)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+            
+        if (user == null) 
         {
-            try
+            await ShowAlertAsync("Ошибка", "Пользователь не найден");
+            return;
+        }
+
+        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            // Удаляем все связанные данные
+            if (user.Logs?.Any() == true)
+                _dbContext.Logs.RemoveRange(user.Logs);
+
+            if (user.Notifications?.Any() == true)
+                _dbContext.Notifications.RemoveRange(user.Notifications);
+
+            if (user.Devices?.Any() == true)
+                _dbContext.Devices.RemoveRange(user.Devices);
+
+            if (user.Profile != null)
+                _dbContext.Profiles.Remove(user.Profile);
+
+            // Удаляем пользователя
+            _dbContext.Users.Remove(user);
+            
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            
+            await LoadPendingTeachersAsync();
+            await ShowAlertAsync("Успех", "✗ Заявка отклонена");
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            
+            // Показываем подробную ошибку
+            var errorMessage = $"Ошибка при удалении: {ex.Message}";
+            if (ex.InnerException != null)
             {
-                var accept = await Shell.Current.DisplayAlert(
-                    "Подтверждение",
-                    "Вы уверены, что хотите отклонить заявку учителя?",
-                    "Да", "Нет");
-
-                if (!accept) return;
-
-                var user = await _dbContext.Users.FindAsync(userId);
-                if (user == null) return;
-
-                _dbContext.Users.Remove(user);
-                await _dbContext.SaveChangesAsync();
-                await LoadPendingTeachersAsync();
-
-                await Shell.Current.DisplayAlert("Успех", "Заявка отклонена", "OK");
+                errorMessage += $"\n\nВнутренняя ошибка: {ex.InnerException.Message}";
             }
-            catch (Exception ex)
+            
+            await ShowAlertAsync("Ошибка", errorMessage);
+        }
+    }
+    catch (Exception ex)
+    {
+        await ShowAlertAsync("Ошибка", ex.Message);
+    }
+    finally
+    {
+        IsBusy = false;
+    }
+}
+
+        private async Task ShowAlertAsync(string title, string message)
+        {
+            var window = Application.Current?.Windows.FirstOrDefault();
+            if (window?.Page != null)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await window.Page.DisplayAlert(title, message, "OK");
             }
         }
+
+        private async Task<bool> ShowConfirmAsync(string title, string message)
+{
+    try
+    {
+        var window = Application.Current?.Windows.FirstOrDefault();
+        if (window?.Page != null)
+        {
+            return await window.Page.DisplayAlert(title, message, "Да", "Нет");
+        }
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Ошибка показа диалога: {ex.Message}");
+    }
+    return false;
+}
     }
 
     public class PendingTeacher

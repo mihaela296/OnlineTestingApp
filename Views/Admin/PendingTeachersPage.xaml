@@ -67,9 +67,9 @@
                                        HorizontalOptions="Center"/>
                             </Border>
                             
-                            <!-- Имя пользователя -->
+                            <!-- Полное имя пользователя -->
                             <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding Username}"
+                                   Text="{Binding FullName}"
                                    FontSize="16"
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>

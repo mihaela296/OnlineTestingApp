@@ -66,34 +66,35 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
             }
         }
 
         [RelayCommand]
-private async Task GoToPendingTeachersAsync()
-{
-    try
-    {
-        var pendingVM = new PendingTeachersViewModel(_dbContext);
-        var pendingPage = new PendingTeachersPage(pendingVM); // Ошибка здесь - нужно передавать ViewModel
-        await Application.Current.MainPage.Navigation.PushAsync(pendingPage);
-    }
-    catch (Exception ex)
-    {
-        await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
-    }
-}
+        private async Task GoToPendingTeachersAsync()
+        {
+            try
+            {
+                var pendingVM = new PendingTeachersViewModel(_dbContext);
+                var pendingPage = new PendingTeachersPage(pendingVM);
+                await Application.Current.MainPage.Navigation.PushAsync(pendingPage);
+            }
+            catch (Exception ex)
+            {
+                await ShowAlertAsync("Ошибка", ex.Message);
+            }
+        }
+
         [RelayCommand]
         private async Task GoToGroupManagementAsync()
         {
-            await Shell.Current.DisplayAlert("Инфо", "Управление группами в разработке", "OK");
+            await ShowAlertAsync("Инфо", "Управление группами в разработке");
         }
 
         [RelayCommand]
         private async Task GoToLogsAsync()
         {
-            await Shell.Current.DisplayAlert("Инфо", "Логи системы в разработке", "OK");
+            await ShowAlertAsync("Инфо", "Логи системы в разработке");
         }
 
         [RelayCommand]
@@ -109,7 +110,16 @@ private async Task GoToPendingTeachersAsync()
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Ошибка", ex.Message, "OK");
+                await ShowAlertAsync("Ошибка", ex.Message);
+            }
+        }
+
+        private async Task ShowAlertAsync(string title, string message)
+        {
+            var window = Application.Current?.Windows.FirstOrDefault();
+            if (window?.Page != null)
+            {
+                await window.Page.DisplayAlert(title, message, "OK");
             }
         }
     }
