@@ -29,59 +29,65 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(bool success, string message, User? user)> LoginAsync(LoginModel model)
+{
+    try
+    {
+        var user = await _dbContext.Users
+            .Include(u => u.Role)
+            .Include(u => u.Profile)
+            .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        if (user == null)
+            return (false, "Пользователь не найден", null);
+
+        // Проверяем, активен ли аккаунт
+        if (!user.IsActive)
         {
-            try
-            {
-                var user = await _dbContext.Users
-                    .Include(u => u.Role)
-                    .Include(u => u.Profile)
-                    .FirstOrDefaultAsync(u => u.Email == model.Email);
-
-                if (user == null)
-                    return (false, "Пользователь не найден", null);
-
-                // ВРЕМЕННОЕ РЕШЕНИЕ: для админа используем простую проверку
-                if (model.Email == "admin@example.com")
-                {
-                    if (model.Password != "admin123")
-                        return (false, "Неверный пароль", null);
-                    
-                    // Устанавливаем правильный хэш для будущих входов
-                    user.PasswordHash = HashPassword("admin123");
-                }
-                else
-                {
-                    // Для остальных пользователей - нормальная проверка хэша
-                    var inputHash = HashPassword(model.Password);
-                    if (user.PasswordHash != inputHash)
-                        return (false, "Неверный пароль", null);
-                }
-
-                user.LastLoginDate = DateTime.UtcNow;
-                
-                if (_deviceService != null)
-                {
-                    await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
-                }
-                await _dbContext.SaveChangesAsync();
-
-                var userJson = JsonSerializer.Serialize(new
-                {
-                    user.UserId,
-                    user.Email,
-                    user.Username,
-                    Role = user.Role?.RoleName,
-                    user.IsActive
-                });
-                Preferences.Set("current_user", userJson);
-
-                return (true, "Успешный вход", user);
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Ошибка входа: {ex.Message}", null);
-            }
+            return (false, "account_deactivated", user); // Специальный статус для деактивированных
         }
+
+        // ВРЕМЕННОЕ РЕШЕНИЕ: для админа используем простую проверку
+        if (model.Email == "admin@example.com")
+        {
+            if (model.Password != "admin123")
+                return (false, "Неверный пароль", null);
+            
+            // Устанавливаем правильный хэш для будущих входов
+            user.PasswordHash = HashPassword("admin123");
+        }
+        else
+        {
+            // Для остальных пользователей - нормальная проверка хэша
+            var inputHash = HashPassword(model.Password);
+            if (user.PasswordHash != inputHash)
+                return (false, "Неверный пароль", null);
+        }
+
+        user.LastLoginDate = DateTime.UtcNow;
+        
+        if (_deviceService != null)
+        {
+            await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
+        }
+        await _dbContext.SaveChangesAsync();
+
+        var userJson = JsonSerializer.Serialize(new
+        {
+            user.UserId,
+            user.Email,
+            user.Username,
+            Role = user.Role?.RoleName,
+            user.IsActive
+        });
+        Preferences.Set("current_user", userJson);
+
+        return (true, "Успешный вход", user);
+    }
+    catch (Exception ex)
+    {
+        return (false, $"Ошибка входа: {ex.Message}", null);
+    }
+}
 
         // Остальные методы без изменений...
         public async Task<(bool success, string message, User? user)> RegisterAsync(RegisterModel model)

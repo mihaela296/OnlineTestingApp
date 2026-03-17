@@ -38,47 +38,62 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-        private async Task LoginAsync()
+private async Task LoginAsync()
+{
+    if (IsBusy)
+        return;
+
+    try
+    {
+        IsBusy = true;
+        HasError = false;
+        ErrorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(LoginModel.Email) || 
+            string.IsNullOrWhiteSpace(LoginModel.Password))
         {
-            if (IsBusy)
-                return;
-
-            try
-            {
-                IsBusy = true;
-                HasError = false;
-                ErrorMessage = string.Empty;
-
-                if (string.IsNullOrWhiteSpace(LoginModel.Email) || 
-                    string.IsNullOrWhiteSpace(LoginModel.Password))
-                {
-                    ErrorMessage = "Заполните все поля";
-                    HasError = true;
-                    return;
-                }
-
-                var result = await _authService.LoginAsync(LoginModel);
-                
-                if (!result.success)
-                {
-                    ErrorMessage = result.message;
-                    HasError = true;
-                    return;
-                }
-
-                var user = result.user;
-                await NavigateBasedOnRole(user);
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Ошибка входа: {ex.Message}";
-                HasError = true;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            ErrorMessage = "Заполните все поля";
+            HasError = true;
+            return;
         }
+
+        var result = await _authService.LoginAsync(LoginModel);
+        
+        if (!result.success)
+        {
+            // Проверяем специальный статус для заблокированных
+            if (result.message == "account_deactivated" && result.user != null)
+            {
+                var blockedPage = new AccountBlockedPage(
+                    new AccountBlockedViewModel(_authService, result.user.Email)
+                );
+                
+                var window = GetCurrentWindow();
+                if (window?.Page != null)
+                {
+                    await window.Page.Navigation.PushAsync(blockedPage);
+                    return;
+                }
+            }
+            
+            ErrorMessage = result.message;
+            HasError = true;
+            return;
+        }
+
+        var user = result.user;
+        await NavigateBasedOnRole(user);
+    }
+    catch (Exception ex)
+    {
+        ErrorMessage = $"Ошибка входа: {ex.Message}";
+        HasError = true;
+    }
+    finally
+    {
+        IsBusy = false;
+    }
+}
 
         [RelayCommand]
         private async Task GoToRegisterAsync()
