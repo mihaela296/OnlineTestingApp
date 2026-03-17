@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OnlineTestingApp.Services;
 using OnlineTestingApp.Views.Auth;
-using System.Collections.Generic;
 using System;
 
 namespace OnlineTestingApp.ViewModels.Auth
@@ -14,6 +13,11 @@ namespace OnlineTestingApp.ViewModels.Auth
 
         [ObservableProperty]
         private string _email = string.Empty;
+
+        [ObservableProperty]
+        private bool _isBusy;
+
+        private const string AdminEmail = "mihaeladorogan298@mail.ru";
 
         public AccountBlockedViewModel(AuthService authService, string email)
         {
@@ -27,14 +31,22 @@ namespace OnlineTestingApp.ViewModels.Auth
         {
             try
             {
-                // Упрощенный вариант - просто показываем информацию
+                IsBusy = true;
+
+                // Просто показываем информацию для копирования
                 await ShowAlertAsync("Связь с поддержкой", 
-                    $"Для связи с поддержкой отправьте email на адрес:\n\nsupport@onlinetesting.com\n\n" +
-                    $"Укажите в письме ваш email: {_userEmail}");
+                    $"Для связи с администратором отправьте письмо:\n\n" +
+                    $"📧 Кому: {AdminEmail}\n" +
+                    $"📝 Тема: Вопрос о блокировке аккаунта {_userEmail}\n\n" +
+                    $"И укажите в письме ваш email: {_userEmail}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await ShowAlertAsync("Ошибка", "Не удалось открыть почтовый клиент");
+                await ShowAlertAsync("Ошибка", ex.Message);
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
