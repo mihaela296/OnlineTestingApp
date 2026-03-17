@@ -108,15 +108,16 @@
                 </VerticalStackLayout>
             </Grid>
 
-            <!-- Телефон -->
+            <!-- Телефон (ИСПРАВЛЕНО - убрал MaskedBehavior) -->
             <Label Text="Телефон"
                    TextColor="#374151"
                    FontSize="13"
                    Margin="0,0,0,2"/>
             
-            <Entry Text="{Binding RegisterModel.PhoneNumber}"
+            <Entry x:Name="PhoneEntry"
+                   Text="{Binding RegisterModel.PhoneNumber}"
                    Placeholder="+7 (999) 123-45-67"
-                   Keyboard="Telephone"
+                   Keyboard="Numeric"
                    BackgroundColor="#F3F4F6"
                    TextColor="#111827"
                    PlaceholderColor="#9CA3AF"
@@ -229,19 +230,19 @@
                     Margin="0,5,0,15"/>
 
             <!-- Ссылка на вход -->
-<HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
-    <Label Text="Уже есть аккаунт?" 
-           TextColor="#4B5563"
-           FontSize="13"/>
-    <Button Text="Войти"
-            Command="{Binding GoToLoginCommand}"
-            BackgroundColor="Transparent"
-            TextColor="#6366F1"
-            FontSize="13"
-            FontAttributes="Bold"
-            Padding="0"
-            Margin="0"/>
-</HorizontalStackLayout>
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
+                <Label Text="Уже есть аккаунт?" 
+                       TextColor="#4B5563"
+                       FontSize="13"/>
+                <Button Text="Войти"
+                        Command="{Binding GoToLoginCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#6366F1"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        Padding="0"
+                        Margin="0"/>
+            </HorizontalStackLayout>
             
         </VerticalStackLayout>
     </ScrollView>
