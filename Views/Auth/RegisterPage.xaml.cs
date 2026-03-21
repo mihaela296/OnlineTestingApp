@@ -41,47 +41,45 @@ public partial class RegisterPage : ContentPage
     }
 
     private void OnPhoneTextChanged(object sender, TextChangedEventArgs e)
+{
+    if (_isUpdatingPhone) return;
+    
+    var entry = sender as Entry;
+    if (entry == null) return;
+
+    _isUpdatingPhone = true;
+
+    try
     {
-        if (_isUpdatingPhone) return;
+        var newText = e.NewTextValue ?? string.Empty;
         
-        var entry = sender as Entry;
-        if (entry == null) return;
-
-        _isUpdatingPhone = true;
-
-        try
+        // Убираем все нецифровые символы
+        string digitsOnly = Regex.Replace(newText, @"[^\d]", "");
+        
+        // Ограничиваем длину до 11 цифр
+        if (digitsOnly.Length > 11)
         {
-            var newText = e.NewTextValue ?? string.Empty;
-            
-            // Убираем все НЕцифровые символы (оставляем только цифры)
-            string digitsOnly = Regex.Replace(newText, @"[^\d]", "");
-            
-            // Ограничиваем длину до 11 цифр
-            if (digitsOnly.Length > 11)
-            {
-                digitsOnly = digitsOnly.Substring(0, 11);
-            }
-            
-            // Форматируем номер вручную
-            string formattedNumber = FormatPhoneNumber(digitsOnly);
-            
-            // Обновляем текст, если он изменился
-            if (entry.Text != formattedNumber)
-            {
-                entry.Text = formattedNumber;
-                
-                // Обновляем модель только чистым номером
-                                if (BindingContext is RegisterViewModel vm)
-                {
-                    vm.RegisterModel.PhoneNumber = formattedNumber;
-                }
-            }
+            digitsOnly = digitsOnly.Substring(0, 11);
         }
-        finally
+        
+        // Форматируем для отображения
+        string formattedNumber = FormatPhoneNumber(digitsOnly);
+        
+        if (entry.Text != formattedNumber)
         {
-            _isUpdatingPhone = false;
+            entry.Text = formattedNumber;
+            
+            if (BindingContext is RegisterViewModel vm)
+            {
+                vm.RegisterModel.PhoneNumber = formattedNumber;
+            }
         }
     }
+    finally
+    {
+        _isUpdatingPhone = false;
+    }
+}
 
     private string FormatPhoneNumber(string digits)
     {

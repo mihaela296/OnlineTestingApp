@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineTestingApp.Data;
 using OnlineTestingApp.Models;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
+using OnlineTestingApp.Services;
 
 namespace OnlineTestingApp.ViewModels.Admin
 {
@@ -70,26 +70,12 @@ namespace OnlineTestingApp.ViewModels.Admin
             EditFirstName = user.FirstName ?? string.Empty;
             EditLastName = user.LastName ?? string.Empty;
             EditEmail = user.Email;
-            EditPhoneNumber = user.PhoneNumber ?? string.Empty; // Просто передаем, он уже отформатирован
+            EditPhoneNumber = AuthService.FormatPhoneForDisplay(user.PhoneNumber);
             EditRole = user.Role;
             EditIsActive = user.IsActive;
-        }
-
-        private string CleanPhoneNumber(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return phone;
             
-            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
-            
-            // Если первая цифра 8, заменяем на 7
-            if (digitsOnly.StartsWith("8") && digitsOnly.Length == 11)
-            {
-                digitsOnly = "7" + digitsOnly.Substring(1);
-            }
-            
-            // Возвращаем в формате +7XXXXXXXXXX
-            return digitsOnly.Length == 11 ? $"+{digitsOnly}" : phone;
+            ValidateUsername();
+            ValidateEmail();
         }
 
         partial void OnEditUsernameChanged(string value)
@@ -109,7 +95,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 
         private void ValidateUsername()
         {
-            IsUsernameValid = !string.IsNullOrWhiteSpace(EditUsername) && EditUsername.Length >= 3;
+            IsUsernameValid = !string.IsNullOrWhiteSpace(EditUsername) && EditUsername.Length >= 2;
             UpdateIsValid();
         }
 
@@ -118,7 +104,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             try
             {
                 var addr = new System.Net.Mail.MailAddress(EditEmail);
-                IsEmailValid = addr.Address == EditEmail;
+                IsEmailValid = addr.Address == EditEmail && !string.IsNullOrWhiteSpace(EditEmail);
             }
             catch
             {
@@ -139,14 +125,20 @@ namespace OnlineTestingApp.ViewModels.Admin
             {
                 IsSaving = true;
                 HasError = false;
+                ErrorMessage = string.Empty;
 
-                // Очищаем номер перед сохранением
-                string cleanPhone = CleanPhoneNumber(EditPhoneNumber);
-
-                // Проверяем, что номер содержит 11 цифр (если он не пустой)
-                if (!string.IsNullOrWhiteSpace(cleanPhone))
+                if (!IsValid)
                 {
-                    var digitsOnly = Regex.Replace(cleanPhone, @"[^\d]", "");
+                    ErrorMessage = "Имя пользователя должно быть не менее 2 символов";
+                    HasError = true;
+                    return;
+                }
+
+                string normalizedPhone = AuthService.NormalizePhoneNumber(EditPhoneNumber);
+
+                if (!string.IsNullOrWhiteSpace(normalizedPhone))
+                {
+                    var digitsOnly = new string(normalizedPhone.Where(char.IsDigit).ToArray());
                     if (digitsOnly.Length != 11)
                     {
                         ErrorMessage = "Номер телефона должен содержать 11 цифр";
@@ -181,7 +173,8 @@ namespace OnlineTestingApp.ViewModels.Admin
 
                 if (dbUser == null)
                 {
-                    await ShowAlertAsync("Ошибка", "Пользователь не найден в базе данных");
+                    ErrorMessage = "Пользователь не найден в базе данных";
+                    HasError = true;
                     return;
                 }
 
@@ -190,7 +183,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 
                 dbUser.Username = EditUsername;
                 dbUser.Email = EditEmail;
-                dbUser.RoleId = role?.RoleId ?? dbUser.RoleId;
+                if (role != null) dbUser.RoleId = role.RoleId;
                 dbUser.IsActive = EditIsActive;
 
                 if (dbUser.Profile == null)
@@ -200,7 +193,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                         UserId = dbUser.UserId,
                         FirstName = EditFirstName,
                         LastName = EditLastName,
-                        PhoneNumber = cleanPhone
+                        PhoneNumber = normalizedPhone
                     };
                     _dbContext.Profiles.Add(dbUser.Profile);
                 }
@@ -208,7 +201,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                 {
                     dbUser.Profile.FirstName = EditFirstName;
                     dbUser.Profile.LastName = EditLastName;
-                    dbUser.Profile.PhoneNumber = cleanPhone;
+                    dbUser.Profile.PhoneNumber = normalizedPhone;
                 }
 
                 await _dbContext.SaveChangesAsync();
@@ -217,7 +210,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                 User.Email = EditEmail;
                 User.FirstName = EditFirstName;
                 User.LastName = EditLastName;
-                User.PhoneNumber = cleanPhone;
+                User.PhoneNumber = AuthService.FormatPhoneForDisplay(normalizedPhone);
                 User.Role = EditRole;
                 User.IsActive = EditIsActive;
 
@@ -225,7 +218,8 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
             catch (Exception ex)
             {
-                await ShowAlertAsync("Ошибка", $"Не удалось сохранить изменения: {ex.Message}");
+                ErrorMessage = $"Ошибка: {ex.Message}";
+                HasError = true;
             }
             finally
             {
@@ -270,7 +264,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             var window = Application.Current?.Windows.FirstOrDefault();
             if (window?.Page != null)
             {
-                await window.Page.DisplayAlertAsync(title, message, "OK");
+                await window.Page.DisplayAlert(title, message, "OK");
             }
         }
     }

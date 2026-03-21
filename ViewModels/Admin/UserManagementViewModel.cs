@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using OnlineTestingApp.Data;
 using OnlineTestingApp.Models;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions; // Добавлено
 using OnlineTestingApp.Views.Admin;
+using OnlineTestingApp.Services;
 
 namespace OnlineTestingApp.ViewModels.Admin
 {
@@ -72,7 +72,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                         Role = user.Role?.RoleName ?? "Unknown",
                         FirstName = user.Profile?.FirstName,
                         LastName = user.Profile?.LastName,
-                        PhoneNumber = FormatStoredPhoneNumber(user.Profile?.PhoneNumber), // Изменено!
+                        PhoneNumber = AuthService.FormatPhoneForDisplay(user.Profile?.PhoneNumber),
                         IsActive = user.IsActive,
                         CreatedAt = user.CreatedAt,
                         Status = user.IsActive ? "Активен" : "Заблокирован"
@@ -87,29 +87,6 @@ namespace OnlineTestingApp.ViewModels.Admin
             {
                 IsBusy = false;
             }
-        }
-
-        // Новый метод для форматирования номера при загрузке
-        private string FormatStoredPhoneNumber(string? phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return string.Empty;
-            
-            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
-            
-            // Если номер начинается с 8, заменяем на 7 для отображения
-            if (digitsOnly.StartsWith("8") && digitsOnly.Length == 11)
-            {
-                digitsOnly = "7" + digitsOnly.Substring(1);
-            }
-            
-            // Форматируем для отображения в маске +X (XXX) XXX-XX-XX
-            if (digitsOnly.Length == 11 && digitsOnly.StartsWith("7"))
-            {
-                return $"+{digitsOnly[0]} ({digitsOnly.Substring(1, 3)}) {digitsOnly.Substring(4, 3)}-{digitsOnly.Substring(7, 2)}-{digitsOnly.Substring(9, 2)}";
-            }
-            
-            return phone;
         }
 
         [RelayCommand]

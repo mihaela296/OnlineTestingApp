@@ -55,7 +55,14 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                // Валидация email
+                // Валидация имени пользователя - минимум 2 символа
+                if (RegisterModel.Username.Length < 2)
+                {
+                    ErrorMessage = "Имя пользователя должно содержать минимум 2 символа";
+                    HasError = true;
+                    return;
+                }
+
                 if (!IsValidEmail(RegisterModel.Email))
                 {
                     ErrorMessage = "Введите корректный email адрес";
@@ -63,7 +70,6 @@ namespace OnlineTestingApp.ViewModels.Auth
                     return;
                 }
 
-                // Валидация пароля
                 if (RegisterModel.Password.Length < 6)
                 {
                     ErrorMessage = "Пароль должен содержать минимум 6 символов";
@@ -74,15 +80,23 @@ namespace OnlineTestingApp.ViewModels.Auth
                 // Валидация телефона (если указан)
                 if (!string.IsNullOrWhiteSpace(RegisterModel.PhoneNumber))
                 {
-                    if (!IsValidRussianPhone(RegisterModel.PhoneNumber))
+                    string normalized = AuthService.NormalizePhoneNumber(RegisterModel.PhoneNumber);
+                    if (string.IsNullOrEmpty(normalized))
                     {
-                        ErrorMessage = "Введите корректный российский номер телефона (11 цифр)";
+                        ErrorMessage = "Введите корректный номер телефона";
                         HasError = true;
                         return;
                     }
                     
-                    // Очищаем номер перед сохранением
-                    RegisterModel.PhoneNumber = CleanPhoneNumber(RegisterModel.PhoneNumber);
+                    var digitsOnly = new string(normalized.Where(char.IsDigit).ToArray());
+                    if (digitsOnly.Length != 11)
+                    {
+                        ErrorMessage = "Номер телефона должен содержать 11 цифр";
+                        HasError = true;
+                        return;
+                    }
+                    
+                    RegisterModel.PhoneNumber = normalized;
                 }
 
                 var result = await _authService.RegisterAsync(RegisterModel);
@@ -148,36 +162,6 @@ namespace OnlineTestingApp.ViewModels.Auth
             {
                 return false;
             }
-        }
-
-        private bool IsValidRussianPhone(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return false;
-
-            // Убираем все нецифровые символы
-            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
-            
-            // Должно быть ровно 11 цифр
-            return digitsOnly.Length == 11;
-        }
-
-        private string CleanPhoneNumber(string phone)
-        {
-            if (string.IsNullOrWhiteSpace(phone))
-                return phone;
-            
-            // Убираем все нецифровые символы
-            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
-            
-            // Если первая цифра 8, заменяем на 7
-            if (digitsOnly.StartsWith("8") && digitsOnly.Length == 11)
-            {
-                digitsOnly = "7" + digitsOnly.Substring(1);
-            }
-            
-            // Возвращаем в формате +7XXXXXXXXXX
-            return $"+{digitsOnly}";
         }
     }
 }

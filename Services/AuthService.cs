@@ -130,7 +130,7 @@ namespace OnlineTestingApp.Services
                     UserId = user.UserId,
                     FirstName = model.FirstName ?? model.Username,
                     LastName = model.LastName,
-                    PhoneNumber = model.PhoneNumber,
+                    PhoneNumber = NormalizePhoneNumber(model.PhoneNumber),
                     AvatarUrl = null
                 };
 
@@ -283,6 +283,53 @@ namespace OnlineTestingApp.Services
             return await _dbContext.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
+        }
+                // Нормализация номера телефона: всегда начинается с +7
+        public static string NormalizePhoneNumber(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return string.Empty;
+
+            // Убираем все нецифровые символы
+            var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
+
+            if (string.IsNullOrEmpty(digitsOnly))
+                return string.Empty;
+
+            // Если первая цифра 8, заменяем на 7
+            if (digitsOnly.Length == 11 && digitsOnly[0] == '8')
+            {
+                digitsOnly = "7" + digitsOnly.Substring(1);
+            }
+            // Если номер из 11 цифр и начинается не с 7, меняем первую цифру на 7
+            else if (digitsOnly.Length == 11 && digitsOnly[0] != '7')
+            {
+                digitsOnly = "7" + digitsOnly.Substring(1);
+            }
+            // Если номер из 10 цифр, добавляем 7 в начало
+            else if (digitsOnly.Length == 10)
+            {
+                digitsOnly = "7" + digitsOnly;
+            }
+
+            // Возвращаем в формате +7XXXXXXXXXX
+            return $"+{digitsOnly}";
+        }
+
+        // Форматирование номера для отображения: +X (XXX) XXX-XX-XX
+        public static string FormatPhoneForDisplay(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return string.Empty;
+
+            var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
+
+            if (digitsOnly.Length == 11)
+            {
+                return $"+{digitsOnly[0]} ({digitsOnly.Substring(1, 3)}) {digitsOnly.Substring(4, 3)}-{digitsOnly.Substring(7, 2)}-{digitsOnly.Substring(9, 2)}";
+            }
+
+            return phone;
         }
     }
 }
