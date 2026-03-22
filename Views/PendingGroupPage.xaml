@@ -7,7 +7,7 @@
     <Grid>
         <Grid Background="{StaticResource BackgroundGradient}"/>
         
-        <!-- Декоративные кружочки вокруг -->
+        <!-- Декоративные кружочки -->
         <Ellipse Fill="#2DD4BF08"
                  WidthRequest="180"
                  HeightRequest="180"
@@ -29,7 +29,6 @@
                  VerticalOptions="Center"
                  Margin="0,-90,0,0"/>
         
-        <!-- Маленькие кружочки по углам -->
         <Ellipse Fill="#2DD4BF08"
                  WidthRequest="80"
                  HeightRequest="80"
@@ -58,7 +57,6 @@
                  VerticalOptions="End"
                  Margin="0,0,25,120"/>
         
-        <!-- Серединные кружочки -->
         <Ellipse Fill="#2DD4BF10"
                  WidthRequest="110"
                  HeightRequest="110"
@@ -88,51 +86,83 @@
                  Margin="0,0,0,-40"/>
         
         <ScrollView>
-            <VerticalStackLayout Spacing="30" Padding="30" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="24" Padding="30" VerticalOptions="Center">
                 
-                <!-- Центральный кружок с иконкой -->
-                <Border WidthRequest="120"
-                        HeightRequest="120"
+                <!-- Иконка с градиентом и свечением -->
+                <Border WidthRequest="80"
+                        HeightRequest="80"
                         HorizontalOptions="Center"
-                        StrokeShape="RoundRectangle 60"
-                        Background="{StaticResource PrimaryGradient}"
-                        Margin="0,0,0,20">
+                        StrokeShape="RoundRectangle 40"
+                        Margin="0,0,0,15">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#2DD4BF" Offset="0.0"/>
+                            <GradientStop Color="#14B8A6" Offset="0.5"/>
+                            <GradientStop Color="#0F9C8A" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow Brush="#2DD4BF80" 
+                                Radius="20" 
+                                Offset="0,4" 
+                                Opacity="0.4"/>
+                    </Border.Shadow>
                     <Label Text="🎓" 
-                           FontSize="58" 
+                           FontSize="38" 
                            TextColor="White"
                            HorizontalOptions="Center" 
                            VerticalOptions="Center"/>
                 </Border>
                 
-                <Label Text="Панель ученика" 
-                       FontSize="32"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource Primary}"
-                       HorizontalOptions="Center"/>
+                <!-- Заголовок с фоном -->
+                <Border Background="{StaticResource GlassBackground}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 30"
+                        Padding="24,12"
+                        WidthRequest="280"
+                        HorizontalOptions="Center"
+                        Margin="0,0,0,10">
+                    <Label Text="Панель ученика" 
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"
+                           HorizontalOptions="Center"/>
+                </Border>
                 
-                <Label Text="Вы успешно зарегистрировались"
-                       FontSize="16"
-                       TextColor="{StaticResource TextSecondary}"
+                <!-- Белая рамка -->
+                <Frame BackgroundColor="{StaticResource Surface}"
+                       CornerRadius="20"
+                       Padding="20,18"
+                       WidthRequest="320"
                        HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
+                       HasShadow="True"
+                       Margin="0,5">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Вы успешно зарегистрировались"
+                               FontSize="15"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="Ожидайте добавления в группу учителем"
+                               FontSize="15"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
                 
-                <Label Text="Ожидайте добавления в группу учителем"
-                       FontSize="16"
-                       TextColor="{StaticResource TextSecondary}"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"/>
-                
+                <!-- Кнопка выхода -->
                 <Button Text="Выйти из аккаунта"
                         x:Name="LogoutButton"
                         BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource Error}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="15"
                         FontAttributes="Bold"
                         HeightRequest="48"
                         CornerRadius="24"
                         WidthRequest="200"
                         HorizontalOptions="Center"
-                        Margin="0,40,0,0"/>
+                        Margin="0,15,0,0"/>
                 
             </VerticalStackLayout>
         </ScrollView>

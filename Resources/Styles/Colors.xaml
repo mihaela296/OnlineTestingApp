@@ -17,6 +17,10 @@
     <Color x:Key="FilterActive">#2DD4BF</Color>
     <Color x:Key="FilterInactive">#F0F7F4</Color>
     
+    <!-- Стеклянные фоны (Glassmorphism) -->
+    <Color x:Key="GlassBackground">#FFFFFFCC</Color>
+    <Color x:Key="GlassBorder">#2DD4BF40</Color>
+    
     <!-- Цвета с прозрачностью -->
     <Color x:Key="Primary10">#2DD4BF10</Color>
     <Color x:Key="Primary20">#2DD4BF20</Color>
@@ -83,7 +87,5 @@
     <Color x:Key="StudentColor">#10B981</Color>
     
     <Color x:Key="ShadowColor">#2DD4BF30</Color>
-    <!-- Добавьте в Colors.xaml -->
-<Color x:Key="Background">#F0FDF9</Color>
 
 </ResourceDictionary>
