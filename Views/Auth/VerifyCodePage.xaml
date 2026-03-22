@@ -3,32 +3,94 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:OnlineTestingApp.Converters"
              x:Class="OnlineTestingApp.Views.Auth.VerifyCodePage"
-             Title="Подтверждение кода"
-             BackgroundColor="White">
-
+             NavigationPage.HasNavigationBar="False">
+    
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-            
-            <Label Text="📧" FontSize="72" HorizontalOptions="Center" Margin="0,0,0,10"/>
-            <Label Text="Проверьте почту" FontSize="28" TextColor="#111827" FontAttributes="Bold" HorizontalOptions="Center"/>
-            <Label Text="Мы отправили 6-значный код на" FontSize="14" TextColor="#4B5563" HorizontalTextAlignment="Center"/>
-            <Label Text="{Binding Email}" FontSize="16" TextColor="#6366F1" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,20"/>
+    <Grid>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
+        <Ellipse Fill="#2DD4BF08" WidthRequest="500" HeightRequest="500" HorizontalOptions="End" VerticalOptions="Start" Margin="0,-200,-150,0"/>
+        <Ellipse Fill="#14B8A610" WidthRequest="400" HeightRequest="400" HorizontalOptions="Start" VerticalOptions="End" Margin="-150,0,0,-100"/>
+        
+        <ScrollView>
+            <VerticalStackLayout Spacing="20" VerticalOptions="Center">
+                
+                <Frame Padding="0" Margin="0" HasShadow="False" BackgroundColor="Transparent">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center" WidthRequest="450">
+                        
+                        <Frame WidthRequest="80"
+                               HeightRequest="80"
+                               CornerRadius="40"
+                               Background="{StaticResource PrimaryGradient}"
+                               HasShadow="False"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,20">
+                            <Label Text="✉️" 
+                                   FontSize="40" 
+                                   TextColor="White"
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                        
+                        <Label Text="Проверьте почту" 
+                               Style="{StaticResource TitleStyle}"
+                               Margin="0,0,0,4"/>
+                        
+                        <Label Text="Мы отправили 6-значный код на"
+                               Style="{StaticResource SubtitleStyle}"/>
+                        
+                        <Label Text="{Binding Email}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,24"/>
 
-            <Label Text="Код из письма" TextColor="#374151" FontSize="13" Margin="0,0,0,2"/>
-            <Entry Text="{Binding Code}" Placeholder="XXXXXX" Keyboard="Numeric" MaxLength="6" BackgroundColor="#F3F4F6" TextColor="#111827" PlaceholderColor="#9CA3AF" FontSize="20" HorizontalTextAlignment="Center" HeightRequest="60" Margin="0,0,0,20"/>
+                        <!-- Код поле -->
+                        <Border Style="{StaticResource EntryStyle}">
+                            <Entry Text="{Binding Code}"
+                                   Placeholder="XXXXXX"
+                                   Keyboard="Numeric"
+                                   MaxLength="6"
+                                   HorizontalTextAlignment="Center"
+                                   FontSize="20"
+                                   BackgroundColor="Transparent"/>
+                        </Border>
 
-            <Label IsVisible="{Binding HasError}" Text="{Binding Message}" TextColor="Red" FontSize="14" HorizontalOptions="Center" Margin="0,0,0,15"/>
+                        <Border IsVisible="{Binding HasError}"
+                                BackgroundColor="{StaticResource ErrorLightBg}"
+                                Padding="12"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                Margin="0,4">
+                            <Label Text="{Binding Message}"
+                                   TextColor="{StaticResource Error}"
+                                   FontSize="13"
+                                   HorizontalOptions="Center"/>
+                        </Border>
 
-            <Button Text="Подтвердить код" Command="{Binding VerifyCodeCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" BackgroundColor="#6366F1" TextColor="White" FontSize="15" FontAttributes="Bold" HeightRequest="48" CornerRadius="24" Margin="0,5,0,15"/>
+                        <Button Text="Подтвердить код"
+                                Command="{Binding VerifyCodeCommand}"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                WidthRequest="200"
+                                HorizontalOptions="Center"
+                                Margin="0,8,0,0"/>
 
-            <Button Text="← Вернуться" Command="{Binding GoBackCommand}" BackgroundColor="Transparent" TextColor="#6366F1" FontSize="14" HorizontalOptions="Center"/>
-            
-        </VerticalStackLayout>
-    </ScrollView>
+                        <Button Text="← Вернуться"
+                                Command="{Binding GoBackCommand}"
+                                Style="{StaticResource GlassButtonStyle}"
+                                WidthRequest="200"
+                                HorizontalOptions="Center"
+                                Margin="0,8,0,0"/>
+                        
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

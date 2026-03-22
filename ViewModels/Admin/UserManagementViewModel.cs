@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using OnlineTestingApp.Data;
 using OnlineTestingApp.Models;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using OnlineTestingApp.Views.Admin;
-using OnlineTestingApp.Services;
 
 namespace OnlineTestingApp.ViewModels.Admin
 {
     public partial class UserManagementViewModel : ObservableObject
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
         [ObservableProperty]
         private ObservableCollection<UserItem> _users = new();
@@ -25,20 +25,26 @@ namespace OnlineTestingApp.ViewModels.Admin
         [ObservableProperty]
         private string _selectedFilter = "all";
 
-        public UserManagementViewModel(AppDbContext dbContext)
+        public UserManagementViewModel(IDbContextFactory<AppDbContext> dbContextFactory)
         {
-            _dbContext = dbContext;
+            _dbContextFactory = dbContextFactory;
         }
 
         [RelayCommand]
         public async Task LoadUsersAsync()
         {
+            if (IsBusy)
+                return;
+
             try
             {
                 IsBusy = true;
                 Users.Clear();
 
-                var query = _dbContext.Users
+                // Создаем новый контекст для каждой операции
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+                var query = dbContext.Users
                     .Include(u => u.Role)
                     .Include(u => u.Profile)
                     .AsQueryable();
@@ -72,7 +78,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                         Role = user.Role?.RoleName ?? "Unknown",
                         FirstName = user.Profile?.FirstName,
                         LastName = user.Profile?.LastName,
-                        PhoneNumber = AuthService.FormatPhoneForDisplay(user.Profile?.PhoneNumber),
+                        PhoneNumber = FormatStoredPhoneNumber(user.Profile?.PhoneNumber),
                         IsActive = user.IsActive,
                         CreatedAt = user.CreatedAt,
                         Status = user.IsActive ? "Активен" : "Заблокирован"
@@ -89,13 +95,33 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
         }
 
+        private string FormatStoredPhoneNumber(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return string.Empty;
+            
+            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
+            
+            if (digitsOnly.StartsWith("8") && digitsOnly.Length == 11)
+            {
+                digitsOnly = "7" + digitsOnly.Substring(1);
+            }
+            
+            if (digitsOnly.Length == 11 && digitsOnly.StartsWith("7"))
+            {
+                return $"+{digitsOnly[0]} ({digitsOnly.Substring(1, 3)}) {digitsOnly.Substring(4, 3)}-{digitsOnly.Substring(7, 2)}-{digitsOnly.Substring(9, 2)}";
+            }
+            
+            return phone;
+        }
+
         [RelayCommand]
-        public void Filter(string filter)
+        public async Task Filter(string filter)
         {
             if (IsBusy) return;
             
             SelectedFilter = filter;
-            LoadUsersCommand.Execute(null);
+            await LoadUsersAsync();
         }
 
         [RelayCommand]
@@ -122,15 +148,19 @@ namespace OnlineTestingApp.ViewModels.Admin
         [RelayCommand]
         public async Task ToggleStatusAsync(int userId)
         {
+            if (IsBusy) return;
+            
             try
             {
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                
                 if (userId <= 0)
                 {
                     await ShowAlertAsync("Ошибка", "Некорректный ID пользователя");
                     return;
                 }
 
-                var user = await _dbContext.Users.FindAsync(userId);
+                var user = await dbContext.Users.FindAsync(userId);
                 if (user == null) 
                 {
                     await ShowAlertAsync("Ошибка", "Пользователь не найден");
@@ -138,7 +168,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                 }
 
                 user.IsActive = !user.IsActive;
-                await _dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 
                 await LoadUsersAsync();
                 
@@ -154,15 +184,19 @@ namespace OnlineTestingApp.ViewModels.Admin
         [RelayCommand]
         public async Task DeleteAsync(int userId)
         {
+            if (IsBusy) return;
+            
             try
             {
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                
                 if (userId <= 0)
                 {
                     await ShowAlertAsync("Ошибка", "Некорректный ID пользователя");
                     return;
                 }
 
-                var user = await _dbContext.Users
+                var user = await dbContext.Users
                     .Include(u => u.Profile)
                     .Include(u => u.Logs)
                     .Include(u => u.Notifications)
@@ -189,28 +223,28 @@ namespace OnlineTestingApp.ViewModels.Admin
 
                 IsBusy = true;
 
-                using var transaction = await _dbContext.Database.BeginTransactionAsync();
+                using var transaction = await dbContext.Database.BeginTransactionAsync();
 
                 try
                 {
                     if (user.Logs?.Any() == true)
-                        _dbContext.Logs.RemoveRange(user.Logs);
+                        dbContext.Logs.RemoveRange(user.Logs);
 
                     if (user.Notifications?.Any() == true)
-                        _dbContext.Notifications.RemoveRange(user.Notifications);
+                        dbContext.Notifications.RemoveRange(user.Notifications);
 
                     if (user.Devices?.Any() == true)
-                        _dbContext.Devices.RemoveRange(user.Devices);
+                        dbContext.Devices.RemoveRange(user.Devices);
 
                     if (user.UserGroups?.Any() == true)
-                        _dbContext.UserGroups.RemoveRange(user.UserGroups);
+                        dbContext.UserGroups.RemoveRange(user.UserGroups);
 
                     if (user.Profile != null)
-                        _dbContext.Profiles.Remove(user.Profile);
+                        dbContext.Profiles.Remove(user.Profile);
 
-                    _dbContext.Users.Remove(user);
+                    dbContext.Users.Remove(user);
                     
-                    await _dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                     await transaction.CommitAsync();
                     
                     await LoadUsersAsync();
@@ -250,6 +284,8 @@ namespace OnlineTestingApp.ViewModels.Admin
         [RelayCommand]
         private async Task EditAsync(int userId)
         {
+            if (IsBusy) return;
+            
             try
             {
                 if (userId <= 0)
@@ -265,7 +301,8 @@ namespace OnlineTestingApp.ViewModels.Admin
                     return;
                 }
 
-                var editViewModel = new EditUserViewModel(_dbContext, user);
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                var editViewModel = new EditUserViewModel(dbContext, user);
                 var editPage = new EditUserPage(editViewModel);
                 
                 var window = Application.Current?.Windows.FirstOrDefault();
@@ -297,8 +334,8 @@ namespace OnlineTestingApp.ViewModels.Admin
         
         public string RoleColor => Role switch
         {
-            "Admin" => "#EF4444",
-            "Teacher" => "#F59E0B",
+            "Admin" => "#F97316",
+            "Teacher" => "#2DD4BF",
             "Student" => "#10B981",
             _ => "#6B7280"
         };

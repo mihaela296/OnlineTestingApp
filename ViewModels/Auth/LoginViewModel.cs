@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using OnlineTestingApp.Views;
 using OnlineTestingApp.Views.Auth;
 using OnlineTestingApp.Views.Admin;
-using OnlineTestingApp.ViewModels.Admin; // Добавлено для AdminDashboardViewModel
-using OnlineTestingApp.Data; // Добавлено для AppDbContext
+using OnlineTestingApp.ViewModels.Admin;
+using OnlineTestingApp.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlineTestingApp.ViewModels.Auth
 {
@@ -38,62 +39,61 @@ namespace OnlineTestingApp.ViewModels.Auth
         }
 
         [RelayCommand]
-private async Task LoginAsync()
-{
-    if (IsBusy)
-        return;
-
-    try
-    {
-        IsBusy = true;
-        HasError = false;
-        ErrorMessage = string.Empty;
-
-        if (string.IsNullOrWhiteSpace(LoginModel.Email) || 
-            string.IsNullOrWhiteSpace(LoginModel.Password))
+        private async Task LoginAsync()
         {
-            ErrorMessage = "Заполните все поля";
-            HasError = true;
-            return;
-        }
+            if (IsBusy)
+                return;
 
-        var result = await _authService.LoginAsync(LoginModel);
-        
-        if (!result.success)
-        {
-            // Проверяем специальный статус для заблокированных
-            if (result.message == "account_deactivated" && result.user != null)
+            try
             {
-                var blockedPage = new AccountBlockedPage(
-                    new AccountBlockedViewModel(_authService, result.user.Email)
-                );
-                
-                var window = GetCurrentWindow();
-                if (window?.Page != null)
+                IsBusy = true;
+                HasError = false;
+                ErrorMessage = string.Empty;
+
+                if (string.IsNullOrWhiteSpace(LoginModel.Email) || 
+                    string.IsNullOrWhiteSpace(LoginModel.Password))
                 {
-                    await window.Page.Navigation.PushAsync(blockedPage);
+                    ErrorMessage = "Заполните все поля";
+                    HasError = true;
                     return;
                 }
-            }
-            
-            ErrorMessage = result.message;
-            HasError = true;
-            return;
-        }
 
-        var user = result.user;
-        await NavigateBasedOnRole(user);
-    }
-    catch (Exception ex)
-    {
-        ErrorMessage = $"Ошибка входа: {ex.Message}";
-        HasError = true;
-    }
-    finally
-    {
-        IsBusy = false;
-    }
-}
+                var result = await _authService.LoginAsync(LoginModel);
+                
+                if (!result.success)
+                {
+                    if (result.message == "account_deactivated" && result.user != null)
+                    {
+                        var blockedPage = new AccountBlockedPage(
+                            new AccountBlockedViewModel(_authService, result.user.Email)
+                        );
+                        
+                        var window = GetCurrentWindow();
+                        if (window?.Page != null)
+                        {
+                            await window.Page.Navigation.PushAsync(blockedPage);
+                            return;
+                        }
+                    }
+                    
+                    ErrorMessage = result.message;
+                    HasError = true;
+                    return;
+                }
+
+                var user = result.user;
+                await NavigateBasedOnRole(user);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Ошибка входа: {ex.Message}";
+                HasError = true;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
 
         [RelayCommand]
         private async Task GoToRegisterAsync()
@@ -173,13 +173,16 @@ private async Task LoginAsync()
                             await window.Page.Navigation.PushAsync(teacherPage);
                             break;
                         case "Admin":
-                            // Используем полное имя с пространством имён
-                            var dbContext = App.Current?.Handler?.MauiContext?.Services.GetService<AppDbContext>();
-                            if (dbContext != null)
+                            var services = App.Current?.Handler?.MauiContext?.Services;
+                            if (services != null)
                             {
-                                var adminVM = new AdminDashboardViewModel(dbContext, _authService);
-                                var adminPage = new OnlineTestingApp.Views.Admin.AdminDashboardPage(adminVM);
-                                await window.Page.Navigation.PushAsync(adminPage);
+                                var dbContextFactory = services.GetService<IDbContextFactory<AppDbContext>>();
+                                if (dbContextFactory != null)
+                                {
+                                    var adminVM = new AdminDashboardViewModel(dbContextFactory, _authService);
+                                    var adminPage = new AdminDashboardPage(adminVM);
+                                    await window.Page.Navigation.PushAsync(adminPage);
+                                }
                             }
                             break;
                         default:
@@ -195,7 +198,6 @@ private async Task LoginAsync()
             }
         }
 
-        // Вспомогательные методы для работы с устаревшим API
         private Window? GetCurrentWindow()
         {
             return Application.Current?.Windows.FirstOrDefault();

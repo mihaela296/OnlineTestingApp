@@ -3,138 +3,200 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Стили для Label -->
+    <!-- ========== ГЛОБАЛЬНЫЕ СТИЛИ ========== -->
     <Style TargetType="Label">
-        <Setter Property="TextColor" Value="{StaticResource Text}" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
     </Style>
+    
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="HeightRequest" Value="52" />
+    </Style>
 
-    <!-- Заголовки -->
+    <!-- ========== ЗАГОЛОВКИ ========== -->
     <Style x:Key="TitleStyle" TargetType="Label">
         <Setter Property="FontSize" Value="32"/>
         <Setter Property="FontFamily" Value="OpenSansSemibold"/>
-        <Setter Property="TextColor" Value="{StaticResource Text}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
         <Setter Property="HorizontalOptions" Value="Center"/>
     </Style>
-
+    
     <Style x:Key="SubtitleStyle" TargetType="Label">
-        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontSize" Value="15"/>
         <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
         <Setter Property="HorizontalOptions" Value="Center"/>
     </Style>
-
-    <!-- Стили для Entry -->
-    <Style x:Key="ModernEntry" TargetType="Entry">
-        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
-        <Setter Property="TextColor" Value="{StaticResource Text}"/>
-        <Setter Property="PlaceholderColor" Value="{StaticResource TextLight}"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="HeightRequest" Value="56"/>
-        <Setter Property="Keyboard" Value="Default"/>
-        
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                    <VisualState x:Name="Normal" />
-                    <VisualState x:Name="Focused">
-                        <VisualState.Setters>
-                            <Setter Property="BackgroundColor" Value="{StaticResource Surface}"/>
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-        
-        <Setter Property="VisualElement.Clip">
+    
+    <!-- ========== КАРТОЧКИ ========== -->
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="Background" Value="{StaticResource Surface}"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="StrokeShape">
             <Setter.Value>
-                <RoundRectangleGeometry CornerRadius="12"/>
+                <RoundRectangle CornerRadius="20"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{StaticResource ShadowColor}" 
+                        Radius="20" 
+                        Offset="0,4" 
+                        Opacity="0.1"/>
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!-- Стили для Button -->
+    
+    <!-- ========== ПОЛЯ ВВОДА ========== -->
+    <Style x:Key="EntryStyle" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="Stroke" Value="#E2E8F0"/>
+        <Setter Property="Background" Value="{StaticResource Surface}"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="StrokeShape">
+            <Setter.Value>
+                <RoundRectangle CornerRadius="12"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- ========== КНОПКИ ========== -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
-        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource PrimaryGradient}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextWhite}"/>
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="FontFamily" Value="OpenSansSemibold"/>
-        <Setter Property="HeightRequest" Value="56"/>
-        <Setter Property="CornerRadius" Value="28"/>
-        
+        <Setter Property="HeightRequest" Value="52"/>
+        <Setter Property="CornerRadius" Value="26"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
                     <VisualState x:Name="Normal" />
                     <VisualState x:Name="Pressed">
                         <VisualState.Setters>
-                            <Setter Property="Scale" Value="0.95"/>
+                            <Setter Property="Scale" Value="0.98"/>
+                            <Setter Property="Opacity" Value="0.9"/>
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
     </Style>
-
-    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+    
+    <Style x:Key="GlassButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource Surface}"/>
         <Setter Property="TextColor" Value="{StaticResource Primary}"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="HeightRequest" Value="56"/>
-        <Setter Property="CornerRadius" Value="28"/>
-        <Setter Property="BorderWidth" Value="2"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="HeightRequest" Value="48"/>
+        <Setter Property="CornerRadius" Value="24"/>
+        <Setter Property="BorderWidth" Value="1.5"/>
         <Setter Property="BorderColor" Value="{StaticResource Primary}"/>
-        
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
                     <VisualState x:Name="Normal" />
                     <VisualState x:Name="Pressed">
                         <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.98"/>
                             <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
-                            <Setter Property="TextColor" Value="White"/>
-                            <Setter Property="Scale" Value="0.95"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextWhite}"/>
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
     </Style>
-
-    <!-- Стиль для Border -->
-    <Style x:Key="CardStyle" TargetType="Border">
+    
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{StaticResource Primary}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="HeightRequest" Value="48"/>
+        <Setter Property="CornerRadius" Value="24"/>
+        <Setter Property="BorderWidth" Value="1.5"/>
+        <Setter Property="BorderColor" Value="{StaticResource Primary}"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.98"/>
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextWhite}"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource SuccessGradient}"/>
+    </Style>
+    
+    <Style x:Key="ErrorButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource ErrorGradient}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextWhite}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontFamily" Value="OpenSansSemibold"/>
+        <Setter Property="HeightRequest" Value="48"/>
+        <Setter Property="CornerRadius" Value="24"/>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="Scale" Value="0.98"/>
+                            <Setter Property="Opacity" Value="0.9"/>
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    
+    <!-- ========== СТИЛИ ДЛЯ АДМИНКИ ========== -->
+    <Style x:Key="StatsCardStyle" TargetType="Border">
         <Setter Property="StrokeThickness" Value="0"/>
-        <Setter Property="Padding" Value="20"/>
         <Setter Property="Background" Value="{StaticResource Surface}"/>
-        <Setter Property="Stroke" Value="Transparent"/>
-        
+        <Setter Property="Padding" Value="20,15"/>
         <Setter Property="StrokeShape">
             <Setter.Value>
                 <RoundRectangle CornerRadius="16"/>
             </Setter.Value>
         </Setter>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="{StaticResource ShadowColor}" 
+                        Radius="12" 
+                        Offset="0,2" 
+                        Opacity="0.08"/>
+            </Setter.Value>
+        </Setter>
     </Style>
-
-    <!-- Стиль для ActivityIndicator -->
-    <Style x:Key="ModernActivityIndicator" TargetType="ActivityIndicator">
-        <Setter Property="Color" Value="{StaticResource Primary}"/>
-        <Setter Property="WidthRequest" Value="48"/>
-        <Setter Property="HeightRequest" Value="48"/>
-        <Setter Property="IsRunning" Value="True"/>
-    </Style>
-
-    <!-- Стили для админки -->
-    <Style x:Key="StatsCardStyle" TargetType="Border">
-        <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
-        <Setter Property="Stroke" Value="#E5E7EB"/>
-        <Setter Property="Padding" Value="15"/>
-        <Setter Property="BackgroundColor" Value="#F9FAFB"/>
-    </Style>
-
-    <Style x:Key="MenuCardStyle" TargetType="Border">
-        <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
-        <Setter Property="Stroke" Value="#E5E7EB"/>
+    
+    <Style x:Key="MenuCardStyle" TargetType="Border" BasedOn="{StaticResource StatsCardStyle}">
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="BackgroundColor" Value="White"/>
+    </Style>
+    
+    <Style x:Key="FilterChipStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="HeightRequest" Value="36"/>
+        <Setter Property="CornerRadius" Value="18"/>
+        <Setter Property="Padding" Value="16,0"/>
+    </Style>
+    
+    <Style x:Key="ActiveFilterChipStyle" TargetType="Button" BasedOn="{StaticResource FilterChipStyle}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextWhite}"/>
     </Style>
 
 </ResourceDictionary>

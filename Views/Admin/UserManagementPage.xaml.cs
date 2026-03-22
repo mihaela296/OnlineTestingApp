@@ -4,38 +4,59 @@ namespace OnlineTestingApp.Views.Admin;
 
 public partial class UserManagementPage : ContentPage
 {
-    public UserManagementPage(UserManagementViewModel viewModel)
+    private bool _isLoading = false;
+    
+    public UserManagementPage()
     {
         InitializeComponent();
+    }
+    
+    public UserManagementPage(UserManagementViewModel viewModel) : this()
+    {
         BindingContext = viewModel;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        // Подписываемся на событие изменения текста
-        SearchEntry.TextChanged += OnSearchTextChanged;
         
-        // Загружаем пользователей при появлении страницы
-        if (BindingContext is UserManagementViewModel vm)
+        if (!_isLoading && BindingContext is UserManagementViewModel vm)
         {
-            vm.LoadUsersCommand.Execute(null);
+            _isLoading = true;
+            
+            Task.Run(async () =>
+            {
+                await Task.Delay(100);
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    vm.LoadUsersCommand.Execute(null);
+                    _isLoading = false;
+                });
+            });
+        }
+        
+        if (SearchEntry != null)
+        {
+            SearchEntry.TextChanged += OnSearchTextChanged;
         }
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        // Отписываемся от события
-        SearchEntry.TextChanged -= OnSearchTextChanged;
+        if (SearchEntry != null)
+        {
+            SearchEntry.TextChanged -= OnSearchTextChanged;
+        }
     }
 
-    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    private async void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
-        // Вызываем поиск при изменении текста
-        if (BindingContext is UserManagementViewModel vm)
+        if (BindingContext is UserManagementViewModel vm && !_isLoading)
         {
-            vm.SearchCommand.Execute(null);
+            _isLoading = true;
+            await vm.SearchCommand.ExecuteAsync(null);
+            _isLoading = false;
         }
     }
 }

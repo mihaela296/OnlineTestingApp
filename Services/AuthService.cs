@@ -186,34 +186,45 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(string status, string message)> GetUserStatusAsync(int userId)
+{
+    try
+    {
+        var user = await _dbContext.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+        if (user == null)
+            return ("not_found", "Пользователь не найден");
+
+        // Добавляем отладку
+        System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync: UserId={userId}, IsActive={user.IsActive}, Role={user.Role?.RoleName}");
+
+        if (!user.IsActive)
         {
-            var user = await _dbContext.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null)
-                return ("not_found", "Пользователь не найден");
-
-            if (!user.IsActive)
+            if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
             {
-                if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
-                {
-                    return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
-                }
-                return ("inactive", "Ваш аккаунт деактивирован");
+                return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
             }
-
-            if (user.Role?.RoleName == "Student")
-            {
-                var hasGroups = await _dbContext.UserGroups
-                    .AnyAsync(ug => ug.UserId == userId);
-                
-                if (!hasGroups)
-                    return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
-            }
-
-            return ("active", "Аккаунт активен");
+            return ("inactive", "Ваш аккаунт деактивирован");
         }
+
+        if (user.Role?.RoleName == "Student")
+        {
+            var hasGroups = await _dbContext.UserGroups
+                .AnyAsync(ug => ug.UserId == userId);
+            
+            if (!hasGroups)
+                return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
+        }
+
+        return ("active", "Аккаунт активен");
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync error: {ex.Message}");
+        return ("error", $"Ошибка: {ex.Message}");
+    }
+}
 
         public Task LogoutAsync()
         {

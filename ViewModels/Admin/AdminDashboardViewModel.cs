@@ -11,7 +11,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 {
     public partial class AdminDashboardViewModel : ObservableObject
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly AuthService _authService;
 
         [ObservableProperty]
@@ -29,24 +29,26 @@ namespace OnlineTestingApp.ViewModels.Admin
         [ObservableProperty]
         private int _totalStudents;
 
-        public AdminDashboardViewModel(AppDbContext dbContext, AuthService authService)
-        {
-            _dbContext = dbContext;
-            _authService = authService;
-        }
+        public AdminDashboardViewModel(IDbContextFactory<AppDbContext> dbContextFactory, AuthService authService)
+{
+    _dbContextFactory = dbContextFactory;
+    _authService = authService;
+}
 
         [RelayCommand]
         public async Task LoadStatsAsync()
         {
             try
             {
-                TotalUsers = await _dbContext.Users.CountAsync();
-                TotalTests = await _dbContext.Tests.CountAsync();
-                TotalTeachers = await _dbContext.Users
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                
+                TotalUsers = await dbContext.Users.CountAsync();
+                TotalTests = await dbContext.Tests.CountAsync();
+                TotalTeachers = await dbContext.Users
                     .CountAsync(u => u.Role != null && u.Role.RoleName == "Teacher" && u.IsActive);
-                TotalStudents = await _dbContext.Users
+                TotalStudents = await dbContext.Users
                     .CountAsync(u => u.Role != null && u.Role.RoleName == "Student" && u.IsActive);
-                PendingTeachers = await _dbContext.Users
+                PendingTeachers = await dbContext.Users
                     .CountAsync(u => !u.IsActive && u.Role != null && u.Role.RoleName == "Teacher");
             }
             catch (Exception ex)
@@ -60,9 +62,14 @@ namespace OnlineTestingApp.ViewModels.Admin
         {
             try
             {
-                var userManagementVM = new UserManagementViewModel(_dbContext);
+                var userManagementVM = new UserManagementViewModel(_dbContextFactory);
                 var userManagementPage = new UserManagementPage(userManagementVM);
-                await Application.Current.MainPage.Navigation.PushAsync(userManagementPage);
+                
+                var window = Application.Current?.Windows.FirstOrDefault();
+                if (window?.Page != null)
+                {
+                    await window.Page.Navigation.PushAsync(userManagementPage);
+                }
             }
             catch (Exception ex)
             {
@@ -75,9 +82,14 @@ namespace OnlineTestingApp.ViewModels.Admin
         {
             try
             {
-                var pendingVM = new PendingTeachersViewModel(_dbContext);
+                var pendingVM = new PendingTeachersViewModel(_dbContextFactory);
                 var pendingPage = new PendingTeachersPage(pendingVM);
-                await Application.Current.MainPage.Navigation.PushAsync(pendingPage);
+                
+                var window = Application.Current?.Windows.FirstOrDefault();
+                if (window?.Page != null)
+                {
+                    await window.Page.Navigation.PushAsync(pendingPage);
+                }
             }
             catch (Exception ex)
             {
@@ -106,7 +118,12 @@ namespace OnlineTestingApp.ViewModels.Admin
                 Preferences.Clear();
                 
                 var loginPage = new LoginPage(new LoginViewModel(_authService));
-                Application.Current.MainPage = new NavigationPage(loginPage);
+                
+                var window = Application.Current?.Windows.FirstOrDefault();
+                if (window?.Page != null)
+                {
+                    Application.Current.MainPage = new NavigationPage(loginPage);
+                }
             }
             catch (Exception ex)
             {

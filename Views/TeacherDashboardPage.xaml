@@ -3,21 +3,57 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OnlineTestingApp.Views.TeacherDashboardPage"
              Title="Панель учителя"
-             BackgroundColor="{StaticResource Background}">
+             NavigationPage.HasNavigationBar="False">
     
     <Grid>
-        <Grid Background="{StaticResource SurfaceGradient}"/>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
+        <Ellipse Fill="#2DD4BF08" WidthRequest="500" HeightRequest="500" HorizontalOptions="End" VerticalOptions="Start" Margin="0,-200,-150,0"/>
+        <Ellipse Fill="#14B8A610" WidthRequest="400" HeightRequest="400" HorizontalOptions="Start" VerticalOptions="End" Margin="-150,0,0,-100"/>
+        
         <ScrollView>
-            <VerticalStackLayout Spacing="30" Padding="30" VerticalOptions="Center">
-                <Label Text="👨‍🏫" FontSize="64" HorizontalOptions="Center"/>
-                <Label Text="Панель учителя" Style="{StaticResource TitleStyle}"/>
-                <Border Style="{StaticResource CardStyle}">
-                    <VerticalStackLayout Spacing="20" Padding="20">
-                        <Label Text="Добро пожаловать!" FontSize="18" FontFamily="OpenSansSemibold" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
-                        <Label Text="Страница в разработке" FontSize="16" TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center"/>
+            <VerticalStackLayout Spacing="20" VerticalOptions="Center">
+                
+                <Frame Padding="0" Margin="0" HasShadow="False" BackgroundColor="Transparent">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center" WidthRequest="450">
+                        
+                        <Frame WidthRequest="100"
+                               HeightRequest="100"
+                               CornerRadius="50"
+                               Background="{StaticResource PrimaryGradient}"
+                               HasShadow="False"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,20">
+                            <Label Text="👨‍🏫" 
+                                   FontSize="48" 
+                                   TextColor="White"
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                        
+                        <Label Text="Панель учителя" 
+                               Style="{StaticResource TitleStyle}"
+                               Margin="0,0,0,4"/>
+                        
+                        <Label Text="Добро пожаловать!"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,8"/>
+                        
+                        <Label Text="Страница в разработке"
+                               Style="{StaticResource SubtitleStyle}"/>
+
+                        <Button Text="Выйти из аккаунта"
+                                x:Name="LogoutButton"
+                                Style="{StaticResource ErrorButtonStyle}"
+                                WidthRequest="200"
+                                HorizontalOptions="Center"
+                                Margin="0,32,0,0"/>
+                        
                     </VerticalStackLayout>
-                </Border>
-                <Button Text="Выйти из аккаунта" x:Name="LogoutButton" BackgroundColor="{StaticResource Error}" TextColor="White" Style="{StaticResource PrimaryButtonStyle}"/>
+                </Frame>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

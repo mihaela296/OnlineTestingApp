@@ -2,23 +2,47 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OnlineTestingApp.Views.Admin.AdminDashboardPage"
-             Title="Панель администратора"
-             BackgroundColor="{StaticResource Background}">
+             Title="Панель администратора">
     
     <Grid>
-        <Grid Background="{StaticResource SurfaceGradient}"/>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
+        <!-- Декоративные круги -->
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="550"
+                 HeightRequest="550"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-250,-200,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF12"
+                 WidthRequest="450"
+                 HeightRequest="450"
+                 HorizontalOptions="End"
+                 VerticalOptions="Center"
+                 Margin="0,0,-200,50"/>
+        
+        <Ellipse Fill="#14B8A610"
+                 WidthRequest="350"
+                 HeightRequest="350"
+                 HorizontalOptions="Center"
+                 VerticalOptions="End"
+                 Margin="0,0,0,-150"/>
         
         <ScrollView>
             <VerticalStackLayout Spacing="25" Padding="25">
                 
-                <!-- Приветствие -->
-                <Label Text="👑 Панель администратора" 
-                       FontSize="28"
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource Primary}"
-                       HorizontalOptions="Center"/>
+                <!-- Приветствие с иконкой -->
+                <HorizontalStackLayout Spacing="12" HorizontalOptions="Center" Margin="0,10,0,20">
+                    <Label Text="👑" FontSize="32" VerticalOptions="Center"/>
+                    <Label Text="Панель администратора" 
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
                 
-                <!-- Статистика -->
+                <!-- Статистика в виде красивых карточек -->
                 <Grid ColumnSpacing="15" RowSpacing="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -29,62 +53,72 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     
-                    <!-- Карточки статистики -->
+                    <!-- Всего пользователей -->
                     <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource StatsCardStyle}">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="👥" FontSize="32"/>
-                            <Label Text="{Binding TotalUsers}" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"/>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="👥" FontSize="28"/>
+                            <Label Text="{Binding TotalUsers}" FontSize="32" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"/>
                             <Label Text="Всего пользователей" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                     </Border>
                     
+                    <!-- Ожидают подтверждения -->
                     <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatsCardStyle}">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="⏳" FontSize="32"/>
-                            <Label Text="{Binding PendingTeachers}" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"/>
-                            <Label Text="Ожидают" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="⏳" FontSize="28"/>
+                            <Label Text="{Binding PendingTeachers}" FontSize="32" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"/>
+                            <Label Text="Ожидают подтверждения" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                     </Border>
                     
+                    <!-- Всего тестов -->
                     <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource StatsCardStyle}">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="📚" FontSize="32"/>
-                            <Label Text="{Binding TotalTests}" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"/>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="📚" FontSize="28"/>
+                            <Label Text="{Binding TotalTests}" FontSize="32" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"/>
                             <Label Text="Всего тестов" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                     </Border>
                     
+                    <!-- Учителей -->
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatsCardStyle}">
-                        <VerticalStackLayout Spacing="5">
-                            <Label Text="👨‍🏫" FontSize="32"/>
-                            <Label Text="{Binding TotalTeachers}" FontSize="24" FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"/>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="👨‍🏫" FontSize="28"/>
+                            <Label Text="{Binding TotalTeachers}" FontSize="32" FontAttributes="Bold"
+                                   TextColor="{StaticResource Primary}"/>
                             <Label Text="Учителей" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
                 
-                <!-- Меню управления -->
                 <Label Text="Управление" 
                        FontSize="18" 
                        FontAttributes="Bold"
                        TextColor="{StaticResource TextPrimary}"
-                       Margin="0,10,0,5"/>
+                       Margin="0,20,0,10"/>
                 
-                <!-- Кнопка для ожидающих учителей -->
+                <!-- Подтверждение учителей -->
                 <Border Style="{StaticResource MenuCardStyle}">
                     <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
-                        <Label Grid.Column="0" Text="⏳" FontSize="24" Margin="0,0,15,0"/>
+                        <Border Grid.Column="0" 
+                                WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 22"
+                                BackgroundColor="{StaticResource Primary20}"
+                                Margin="0,0,12,0">
+                            <Label Text="⏳" FontSize="22" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Border>
                         <VerticalStackLayout Grid.Column="1">
                             <Label Text="Подтверждение учителей" 
                                    FontSize="16" 
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
-                            <Label Text="{Binding PendingTeachers, StringFormat='Ожидают: {0}'}" 
-                                   FontSize="12" 
+                            <Label Text="{Binding PendingTeachers, StringFormat='Ожидают подтверждения: {0}'}" 
+                                   FontSize="13" 
                                    TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                         <Button Grid.Column="2" 
@@ -93,19 +127,28 @@
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}"
                                 FontSize="24"
+                                FontAttributes="Bold"
                                 Padding="10,0"/>
                     </Grid>
                 </Border>
                 
-                <!-- Кнопки управления -->
+                <!-- Пользователи -->
                 <Border Style="{StaticResource MenuCardStyle}">
                     <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
-                        <Label Grid.Column="0" Text="👥" FontSize="24" Margin="0,0,15,0"/>
+                        <Border Grid.Column="0" 
+                                WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 22"
+                                BackgroundColor="{StaticResource Primary20}"
+                                Margin="0,0,12,0">
+                            <Label Text="👥" FontSize="22" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Border>
                         <VerticalStackLayout Grid.Column="1">
                             <Label Text="Пользователи" FontSize="16" FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
-                            <Label Text="Управление, подтверждение учителей" 
-                                   FontSize="12" 
+                            <Label Text="Управление пользователями, подтверждение учителей" 
+                                   FontSize="13" 
                                    TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                         <Button Grid.Column="2" 
@@ -114,18 +157,28 @@
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}"
                                 FontSize="24"
+                                FontAttributes="Bold"
                                 Padding="10,0"/>
                     </Grid>
                 </Border>
                 
+                <!-- Группы -->
                 <Border Style="{StaticResource MenuCardStyle}">
                     <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
-                        <Label Grid.Column="0" Text="👥" FontSize="24" Margin="0,0,15,0"/>
+                        <Border Grid.Column="0" 
+                                WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 22"
+                                BackgroundColor="{StaticResource Primary20}"
+                                Margin="0,0,12,0">
+                            <Label Text="👥" FontSize="22" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Border>
                         <VerticalStackLayout Grid.Column="1">
                             <Label Text="Группы" FontSize="16" FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Создание и управление группами" 
-                                   FontSize="12" 
+                                   FontSize="13" 
                                    TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                         <Button Grid.Column="2" 
@@ -134,18 +187,28 @@
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}"
                                 FontSize="24"
+                                FontAttributes="Bold"
                                 Padding="10,0"/>
                     </Grid>
                 </Border>
                 
+                <!-- Логи системы -->
                 <Border Style="{StaticResource MenuCardStyle}">
                     <Grid ColumnDefinitions="Auto, *, Auto" Padding="15">
-                        <Label Grid.Column="0" Text="📋" FontSize="24" Margin="0,0,15,0"/>
+                        <Border Grid.Column="0" 
+                                WidthRequest="44" HeightRequest="44"
+                                StrokeShape="RoundRectangle 22"
+                                BackgroundColor="{StaticResource Primary20}"
+                                Margin="0,0,12,0">
+                            <Label Text="📋" FontSize="22" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Border>
                         <VerticalStackLayout Grid.Column="1">
                             <Label Text="Логи системы" FontSize="16" FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
                             <Label Text="Просмотр действий пользователей" 
-                                   FontSize="12" 
+                                   FontSize="13" 
                                    TextColor="{StaticResource TextSecondary}"/>
                         </VerticalStackLayout>
                         <Button Grid.Column="2" 
@@ -154,6 +217,7 @@
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}"
                                 FontSize="24"
+                                FontAttributes="Bold"
                                 Padding="10,0"/>
                     </Grid>
                 </Border>
@@ -161,8 +225,8 @@
                 <!-- Кнопка выхода -->
                 <Button Text="Выйти из аккаунта"
                         Command="{Binding LogoutCommand}"
-                        BackgroundColor="{StaticResource Error}"
-                        TextColor="White"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource Error}"
                         FontSize="15"
                         FontAttributes="Bold"
                         HeightRequest="48"

@@ -4,11 +4,22 @@ namespace OnlineTestingApp.Views.Admin;
 
 public partial class PendingTeachersPage : ContentPage
 {
-    public PendingTeachersPage(PendingTeachersViewModel viewModel)
+    public PendingTeachersPage()
     {
         InitializeComponent();
+    }
+    
+    public PendingTeachersPage(PendingTeachersViewModel viewModel) : this()
+    {
         BindingContext = viewModel;
         
-        Appearing += async (s, e) => await viewModel.LoadPendingTeachersAsync();
+        // Загружаем данные при появлении страницы
+        Appearing += async (s, e) => 
+        {
+            if (viewModel != null)
+            {
+                await viewModel.LoadPendingTeachersAsync();
+            }
+        };
     }
 }

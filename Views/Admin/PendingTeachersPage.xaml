@@ -2,10 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OnlineTestingApp.Views.Admin.PendingTeachersPage"
-             Title="Ожидают подтверждения"
-             BackgroundColor="{StaticResource Background}">
+             Title="Ожидают подтверждения">
 
     <Grid>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,8 +16,16 @@
         <Border Grid.Row="0" 
                 Style="{StaticResource StatsCardStyle}"
                 Margin="20,20,20,10">
-            <Grid ColumnDefinitions="Auto, *" Padding="10">
-                <Label Grid.Column="0" Text="⏳" FontSize="32" Margin="0,0,15,0"/>
+            <Grid ColumnDefinitions="Auto, *" Padding="12">
+                <Border Grid.Column="0" 
+                        WidthRequest="50" HeightRequest="50"
+                        StrokeShape="RoundRectangle 25"
+                        BackgroundColor="{StaticResource Primary20}"
+                        Margin="0,0,12,0">
+                    <Label Text="⏳" FontSize="24" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"/>
+                </Border>
                 <VerticalStackLayout Grid.Column="1">
                     <Label Text="Ожидают подтверждения" 
                            FontSize="20" 
@@ -53,46 +62,40 @@
                               ColumnDefinitions="Auto, *, Auto"
                               Padding="15">
                             
-                            <!-- Аватар -->
                             <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
                                    WidthRequest="50" HeightRequest="50"
                                    StrokeShape="RoundRectangle 25"
-                                   BackgroundColor="{StaticResource Warning}"
+                                   BackgroundColor="{StaticResource Primary40}"
                                    Margin="0,0,12,0">
                                 <Label Text="{Binding Username[0]}" 
                                        FontSize="20" 
                                        FontAttributes="Bold"
-                                       TextColor="White"
+                                       TextColor="{StaticResource Primary}"
                                        VerticalOptions="Center"
                                        HorizontalOptions="Center"/>
                             </Border>
                             
-                            <!-- Полное имя пользователя -->
                             <Label Grid.Row="0" Grid.Column="1"
                                    Text="{Binding FullName}"
                                    FontSize="16"
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"/>
                             
-                            <!-- Email -->
                             <Label Grid.Row="1" Grid.Column="1"
                                    Text="{Binding Email}"
                                    FontSize="14"
                                    TextColor="{StaticResource TextSecondary}"/>
                             
-                            <!-- Дата регистрации -->
                             <Label Grid.Row="2" Grid.Column="1"
                                    Text="{Binding CreatedAt, StringFormat='Зарегистрирован: {0:dd.MM.yyyy}'}"
                                    FontSize="12"
-                                   TextColor="{StaticResource TextLight}"/>
+                                   TextColor="{StaticResource TextMuted}"/>
                             
-                            <!-- Кнопки действий -->
                             <HorizontalStackLayout Grid.Row="0" Grid.Column="2" 
                                                   Grid.RowSpan="3"
                                                   Spacing="8"
                                                   VerticalOptions="Center">
                                 
-                                <!-- Подтвердить -->
                                 <Button Text="✓"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveCommand}"
                                         CommandParameter="{Binding UserId}"
@@ -104,11 +107,10 @@
                                         HeightRequest="45"
                                         CornerRadius="23"/>
                                 
-                                <!-- Отклонить -->
                                 <Button Text="✗"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Error}"
+                                        BackgroundColor="{StaticResource Accent}"
                                         TextColor="White"
                                         FontSize="16"
                                         FontAttributes="Bold"

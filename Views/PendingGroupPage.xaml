@@ -2,22 +2,56 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OnlineTestingApp.Views.PendingGroupPage"
-             Title="Ожидание группы"
-             BackgroundColor="{StaticResource Background}">
+             NavigationPage.HasNavigationBar="False">
     
     <Grid>
-        <Grid Background="{StaticResource SurfaceGradient}"/>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
+        <Ellipse Fill="#2DD4BF08" WidthRequest="500" HeightRequest="500" HorizontalOptions="Center" VerticalOptions="Center"/>
+        
         <ScrollView>
-            <VerticalStackLayout Spacing="30" Padding="30" VerticalOptions="Center">
-                <Label Text="⏳" FontSize="64" HorizontalOptions="Center"/>
-                <Label Text="Ожидание добавления в группу" Style="{StaticResource TitleStyle}"/>
-                <Border Style="{StaticResource CardStyle}">
-                    <VerticalStackLayout Spacing="20" Padding="20">
-                        <Label Text="Вы успешно зарегистрировались!" FontSize="18" FontFamily="OpenSansSemibold" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
-                        <Label Text="Ожидайте добавления в группу учителем." FontSize="16" TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center"/>
+            <VerticalStackLayout Spacing="20" VerticalOptions="Center">
+                
+                <Frame Padding="0" Margin="0" HasShadow="False" BackgroundColor="Transparent">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center" WidthRequest="450">
+                        
+                        <Frame WidthRequest="100"
+                               HeightRequest="100"
+                               CornerRadius="50"
+                               Background="{StaticResource PrimaryGradient}"
+                               HasShadow="False"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,20">
+                            <Label Text="⏳" 
+                                   FontSize="48" 
+                                   TextColor="White"
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                        
+                        <Label Text="Ожидание группы" 
+                               Style="{StaticResource TitleStyle}"
+                               Margin="0,0,0,4"/>
+                        
+                        <Label Text="Вы успешно зарегистрировались!"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,8"/>
+                        
+                        <Label Text="Ожидайте добавления в группу учителем."
+                               Style="{StaticResource SubtitleStyle}"/>
+
+                        <Button Text="Выйти из аккаунта"
+                                x:Name="LogoutButton"
+                                Style="{StaticResource ErrorButtonStyle}"
+                                WidthRequest="200"
+                                HorizontalOptions="Center"
+                                Margin="0,32,0,0"/>
+                        
                     </VerticalStackLayout>
-                </Border>
-                <Button Text="Выйти из аккаунта" x:Name="LogoutButton" BackgroundColor="{StaticResource Error}" TextColor="White" Style="{StaticResource PrimaryButtonStyle}"/>
+                </Frame>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

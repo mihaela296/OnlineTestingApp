@@ -6,7 +6,7 @@ using OnlineTestingApp.ViewModels.Admin;
 using OnlineTestingApp.Views;
 using OnlineTestingApp.Views.Auth;
 using OnlineTestingApp.Views.Admin;
-using CommunityToolkit.Maui; // Добавь эту строку
+using CommunityToolkit.Maui;
 
 namespace OnlineTestingApp;
 
@@ -17,7 +17,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCommunityToolkit() // Добавлено для поддержки toolkit
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -25,14 +25,20 @@ public static class MauiProgram
             });
 
         var connectionString = "Server=OnlineTestingPlatform.mssql.somee.com;Database=OnlineTestingPlatform;User Id=Dorogan_SQLLogin_1;Password=x4c9e1mit9;TrustServerCertificate=true;";
+        
+        // Регистрируем DbContext с фабрикой
+        builder.Services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseSqlServer(connectionString));
+        
+        // Также регистрируем сам DbContext как Scoped для совместимости
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 
         // Services
-        builder.Services.AddSingleton<DatabaseTestService>();
-        builder.Services.AddSingleton<DeviceService>();
-        builder.Services.AddSingleton<AuthService>();
-        builder.Services.AddSingleton<IEmailService, EmailService>();
+        builder.Services.AddScoped<DatabaseTestService>();
+        builder.Services.AddScoped<DeviceService>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<IEmailService, EmailService>();
 
         // Auth ViewModels
         builder.Services.AddTransient<LoginViewModel>();

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineTestingApp.Data;
 using OnlineTestingApp.Models;
 using System.Collections.ObjectModel;
-using OnlineTestingApp.Services;
+using System.Text.RegularExpressions;
 
 namespace OnlineTestingApp.ViewModels.Admin
 {
@@ -70,12 +70,24 @@ namespace OnlineTestingApp.ViewModels.Admin
             EditFirstName = user.FirstName ?? string.Empty;
             EditLastName = user.LastName ?? string.Empty;
             EditEmail = user.Email;
-            EditPhoneNumber = AuthService.FormatPhoneForDisplay(user.PhoneNumber);
+            EditPhoneNumber = user.PhoneNumber ?? string.Empty;
             EditRole = user.Role;
             EditIsActive = user.IsActive;
+        }
+
+        private string CleanPhoneNumber(string phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return phone;
             
-            ValidateUsername();
-            ValidateEmail();
+            var digitsOnly = Regex.Replace(phone, @"[^\d]", "");
+            
+            if (digitsOnly.StartsWith("8") && digitsOnly.Length == 11)
+            {
+                digitsOnly = "7" + digitsOnly.Substring(1);
+            }
+            
+            return digitsOnly.Length == 11 ? $"+{digitsOnly}" : phone;
         }
 
         partial void OnEditUsernameChanged(string value)
@@ -95,7 +107,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 
         private void ValidateUsername()
         {
-            IsUsernameValid = !string.IsNullOrWhiteSpace(EditUsername) && EditUsername.Length >= 2;
+            IsUsernameValid = !string.IsNullOrWhiteSpace(EditUsername) && EditUsername.Length >= 3;
             UpdateIsValid();
         }
 
@@ -104,7 +116,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             try
             {
                 var addr = new System.Net.Mail.MailAddress(EditEmail);
-                IsEmailValid = addr.Address == EditEmail && !string.IsNullOrWhiteSpace(EditEmail);
+                IsEmailValid = addr.Address == EditEmail;
             }
             catch
             {
@@ -125,20 +137,12 @@ namespace OnlineTestingApp.ViewModels.Admin
             {
                 IsSaving = true;
                 HasError = false;
-                ErrorMessage = string.Empty;
 
-                if (!IsValid)
+                string cleanPhone = CleanPhoneNumber(EditPhoneNumber);
+
+                if (!string.IsNullOrWhiteSpace(cleanPhone))
                 {
-                    ErrorMessage = "Имя пользователя должно быть не менее 2 символов";
-                    HasError = true;
-                    return;
-                }
-
-                string normalizedPhone = AuthService.NormalizePhoneNumber(EditPhoneNumber);
-
-                if (!string.IsNullOrWhiteSpace(normalizedPhone))
-                {
-                    var digitsOnly = new string(normalizedPhone.Where(char.IsDigit).ToArray());
+                    var digitsOnly = Regex.Replace(cleanPhone, @"[^\d]", "");
                     if (digitsOnly.Length != 11)
                     {
                         ErrorMessage = "Номер телефона должен содержать 11 цифр";
@@ -173,8 +177,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 
                 if (dbUser == null)
                 {
-                    ErrorMessage = "Пользователь не найден в базе данных";
-                    HasError = true;
+                    await ShowAlertAsync("Ошибка", "Пользователь не найден в базе данных");
                     return;
                 }
 
@@ -183,7 +186,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 
                 dbUser.Username = EditUsername;
                 dbUser.Email = EditEmail;
-                if (role != null) dbUser.RoleId = role.RoleId;
+                dbUser.RoleId = role?.RoleId ?? dbUser.RoleId;
                 dbUser.IsActive = EditIsActive;
 
                 if (dbUser.Profile == null)
@@ -193,7 +196,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                         UserId = dbUser.UserId,
                         FirstName = EditFirstName,
                         LastName = EditLastName,
-                        PhoneNumber = normalizedPhone
+                        PhoneNumber = cleanPhone
                     };
                     _dbContext.Profiles.Add(dbUser.Profile);
                 }
@@ -201,7 +204,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                 {
                     dbUser.Profile.FirstName = EditFirstName;
                     dbUser.Profile.LastName = EditLastName;
-                    dbUser.Profile.PhoneNumber = normalizedPhone;
+                    dbUser.Profile.PhoneNumber = cleanPhone;
                 }
 
                 await _dbContext.SaveChangesAsync();
@@ -210,7 +213,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                 User.Email = EditEmail;
                 User.FirstName = EditFirstName;
                 User.LastName = EditLastName;
-                User.PhoneNumber = AuthService.FormatPhoneForDisplay(normalizedPhone);
+                User.PhoneNumber = cleanPhone;
                 User.Role = EditRole;
                 User.IsActive = EditIsActive;
 
@@ -218,8 +221,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Ошибка: {ex.Message}";
-                HasError = true;
+                await ShowAlertAsync("Ошибка", $"Не удалось сохранить изменения: {ex.Message}");
             }
             finally
             {

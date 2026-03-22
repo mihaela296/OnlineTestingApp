@@ -1,4 +1,3 @@
-// ViewModels/Admin/PendingTeachersViewModel.cs
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace OnlineTestingApp.ViewModels.Admin
 {
     public partial class PendingTeachersViewModel : ObservableObject
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
 
         [ObservableProperty]
         private ObservableCollection<PendingTeacher> _pendingTeachers = new();
@@ -21,20 +20,24 @@ namespace OnlineTestingApp.ViewModels.Admin
         [ObservableProperty]
         private bool _isBusy;
 
-        public PendingTeachersViewModel(AppDbContext dbContext)
+        public PendingTeachersViewModel(IDbContextFactory<AppDbContext> dbContextFactory)
         {
-            _dbContext = dbContext;
+            _dbContextFactory = dbContextFactory;
         }
 
         [RelayCommand]
         public async Task LoadPendingTeachersAsync()
         {
+            if (IsBusy) return;
+            
             try
             {
                 IsBusy = true;
                 PendingTeachers.Clear();
 
-                var teachers = await _dbContext.Users
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+                var teachers = await dbContext.Users
                     .Include(u => u.Role)
                     .Include(u => u.Profile)
                     .Where(u => !u.IsActive && u.Role != null && u.Role.RoleName == "Teacher")
@@ -69,14 +72,18 @@ namespace OnlineTestingApp.ViewModels.Admin
         [RelayCommand]
         public async Task ApproveAsync(int userId)
         {
+            if (IsBusy) return;
+            
             try
             {
-                var user = await _dbContext.Users.FindAsync(userId);
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+                
+                var user = await dbContext.Users.FindAsync(userId);
                 if (user == null) return;
 
                 user.IsActive = true;
                 
-                _dbContext.Logs.Add(new Log
+                dbContext.Logs.Add(new Log
                 {
                     UserId = userId,
                     Action = "TeacherApproved",
@@ -84,7 +91,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                     Details = "Учитель подтверждён администратором"
                 });
 
-                await _dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 await LoadPendingTeachersAsync();
 
                 await ShowAlertAsync("Успех", "✅ Учитель подтверждён");
@@ -96,81 +103,74 @@ namespace OnlineTestingApp.ViewModels.Admin
         }
 
         [RelayCommand]
-public async Task RejectAsync(int userId)
-{
-    try
-    {
-        var accept = await ShowConfirmAsync(
-            "Подтверждение",
-            "Вы уверены, что хотите отклонить заявку учителя?");
-
-        if (!accept) return;
-
-        IsBusy = true;
-
-        // Загружаем учителя со всеми связанными данными
-        var user = await _dbContext.Users
-            .Include(u => u.Profile)
-            .Include(u => u.Logs)
-            .Include(u => u.Notifications)
-            .Include(u => u.Devices)
-            .FirstOrDefaultAsync(u => u.UserId == userId);
-            
-        if (user == null) 
+        public async Task RejectAsync(int userId)
         {
-            await ShowAlertAsync("Ошибка", "Пользователь не найден");
-            return;
-        }
-
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
-
-        try
-        {
-            // Удаляем все связанные данные
-            if (user.Logs?.Any() == true)
-                _dbContext.Logs.RemoveRange(user.Logs);
-
-            if (user.Notifications?.Any() == true)
-                _dbContext.Notifications.RemoveRange(user.Notifications);
-
-            if (user.Devices?.Any() == true)
-                _dbContext.Devices.RemoveRange(user.Devices);
-
-            if (user.Profile != null)
-                _dbContext.Profiles.Remove(user.Profile);
-
-            // Удаляем пользователя
-            _dbContext.Users.Remove(user);
+            if (IsBusy) return;
             
-            await _dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
-            
-            await LoadPendingTeachersAsync();
-            await ShowAlertAsync("Успех", "✗ Заявка отклонена");
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            
-            // Показываем подробную ошибку
-            var errorMessage = $"Ошибка при удалении: {ex.Message}";
-            if (ex.InnerException != null)
+            try
             {
-                errorMessage += $"\n\nВнутренняя ошибка: {ex.InnerException.Message}";
+                var accept = await ShowConfirmAsync(
+                    "Подтверждение",
+                    "Вы уверены, что хотите отклонить заявку учителя?");
+
+                if (!accept) return;
+
+                IsBusy = true;
+
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+                var user = await dbContext.Users
+                    .Include(u => u.Profile)
+                    .Include(u => u.Logs)
+                    .Include(u => u.Notifications)
+                    .Include(u => u.Devices)
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+                    
+                if (user == null) 
+                {
+                    await ShowAlertAsync("Ошибка", "Пользователь не найден");
+                    return;
+                }
+
+                using var transaction = await dbContext.Database.BeginTransactionAsync();
+
+                try
+                {
+                    if (user.Logs?.Any() == true)
+                        dbContext.Logs.RemoveRange(user.Logs);
+
+                    if (user.Notifications?.Any() == true)
+                        dbContext.Notifications.RemoveRange(user.Notifications);
+
+                    if (user.Devices?.Any() == true)
+                        dbContext.Devices.RemoveRange(user.Devices);
+
+                    if (user.Profile != null)
+                        dbContext.Profiles.Remove(user.Profile);
+
+                    dbContext.Users.Remove(user);
+                    
+                    await dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    
+                    await LoadPendingTeachersAsync();
+                    await ShowAlertAsync("Успех", "✗ Заявка отклонена");
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;  // Исправлено: throw вместо throw ex
+                }
             }
-            
-            await ShowAlertAsync("Ошибка", errorMessage);
+            catch (Exception ex)
+            {
+                await ShowAlertAsync("Ошибка", ex.Message);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
-    }
-    catch (Exception ex)
-    {
-        await ShowAlertAsync("Ошибка", ex.Message);
-    }
-    finally
-    {
-        IsBusy = false;
-    }
-}
 
         private async Task ShowAlertAsync(string title, string message)
         {
@@ -182,21 +182,21 @@ public async Task RejectAsync(int userId)
         }
 
         private async Task<bool> ShowConfirmAsync(string title, string message)
-{
-    try
-    {
-        var window = Application.Current?.Windows.FirstOrDefault();
-        if (window?.Page != null)
         {
-            return await window.Page.DisplayAlert(title, message, "Да", "Нет");
+            try
+            {
+                var window = Application.Current?.Windows.FirstOrDefault();
+                if (window?.Page != null)
+                {
+                    return await window.Page.DisplayAlert(title, message, "Да", "Нет");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка показа диалога: {ex.Message}");
+            }
+            return false;
         }
-    }
-    catch (Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"Ошибка показа диалога: {ex.Message}");
-    }
-    return false;
-}
     }
 
     public class PendingTeacher

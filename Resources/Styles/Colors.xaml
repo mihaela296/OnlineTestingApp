@@ -4,39 +4,81 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Основные цвета -->
-    <Color x:Key="Primary">#6366F1</Color>
-    <Color x:Key="PrimaryDark">#4F46E5</Color>
-    <Color x:Key="Secondary">#8B5CF6</Color>
-    <Color x:Key="Accent">#EC4899</Color>
+    <!-- ========== ОСНОВНЫЕ ЦВЕТА ========== -->
+    <Color x:Key="Primary">#2DD4BF</Color>           
+    <Color x:Key="PrimaryLight">#5EEAD4</Color>      
+    <Color x:Key="PrimaryDark">#14B8A6</Color> 
     
-    <!-- Фоновые цвета -->
-    <Color x:Key="Background">#F9FAFB</Color>
-    <Color x:Key="Surface">#FFFFFF</Color>
-    <Color x:Key="SurfaceVariant">#F3F4F6</Color>
+    <!-- Цвета с прозрачностью -->
+    <Color x:Key="Primary10">#2DD4BF10</Color>
+    <Color x:Key="Primary20">#2DD4BF20</Color>
+    <Color x:Key="Primary30">#2DD4BF30</Color>
+    <Color x:Key="Primary40">#2DD4BF40</Color>
     
-    <!-- Текст -->
-    <Color x:Key="TextPrimary">#111827</Color>     <!-- Добавлено! -->
-    <Color x:Key="Text">#111827</Color>            <!-- Почти черный -->
-    <Color x:Key="TextSecondary">#374151</Color>   <!-- Темно-серый -->
-    <Color x:Key="TextLight">#6B7280</Color>       <!-- Серый -->
+    <Color x:Key="White">#FFFFFF</Color>
+    <Color x:Key="Black">#0F172A</Color>
+    <Color x:Key="DarkGray">#1E293B</Color>
+    <Color x:Key="Gray">#334155</Color>
+    <Color x:Key="LightGray">#F1F5F9</Color>
     
-    <!-- Состояния -->
-    <Color x:Key="Success">#10B981</Color>
-    <Color x:Key="Warning">#F59E0B</Color>
-    <Color x:Key="Error">#EF4444</Color>
-    <Color x:Key="Info">#3B82F6</Color>
+    <Color x:Key="Accent">#F59E0B</Color>
+    <Color x:Key="AccentLight">#FBBF24</Color>
+    <Color x:Key="Accent20">#F59E0B20</Color>
+    <Color x:Key="Accent40">#F59E0B40</Color>
     
-    <!-- Градиенты -->
+    <!-- ========== ФОНОВЫЕ ГРАДИЕНТЫ ========== -->
+    <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#F0FDF9" Offset="0.0"/>
+        <GradientStop Color="#E6F7F3" Offset="0.5"/>
+        <GradientStop Color="#DCF5EF" Offset="1.0"/>
+    </LinearGradientBrush>
+    
+    <!-- ========== ГРАДИЕНТЫ ДЛЯ КНОПОК ========== -->
     <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#6366F1" Offset="0.1"/>
-        <GradientStop Color="#8B5CF6" Offset="0.5"/>
-        <GradientStop Color="#EC4899" Offset="1.0"/>
+        <GradientStop Color="#2DD4BF" Offset="0.0"/>
+        <GradientStop Color="#14B8A6" Offset="1.0"/>
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="SurfaceGradient" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#FFFFFF" Offset="0"/>
-        <GradientStop Color="#F9FAFB" Offset="1"/>
+    <LinearGradientBrush x:Key="SuccessGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#2DD4BF" Offset="0.0"/>
+        <GradientStop Color="#5EEAD4" Offset="1.0"/>
     </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="ErrorGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#F59E0B" Offset="0.0"/>
+        <GradientStop Color="#FBBF24" Offset="1.0"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="WarningGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#F59E0B" Offset="0.0"/>
+        <GradientStop Color="#FBBF24" Offset="1.0"/>
+    </LinearGradientBrush>
+    
+    <!-- ========== ПОВЕРХНОСТИ ========== -->
+    <Color x:Key="Surface">#FFFFFF</Color>
+    <Color x:Key="SurfaceVariant">#F9FFFD</Color>
+    <Color x:Key="SurfaceDark">#F0F7F4</Color>
+    
+    <!-- ========== ЦВЕТА ТЕКСТА ========== -->
+    <Color x:Key="TextPrimary">#0F172A</Color>
+    <Color x:Key="TextSecondary">#475569</Color>
+    <Color x:Key="TextMuted">#94A3B8</Color>
+    <Color x:Key="TextWhite">#FFFFFF</Color>
+    
+    <!-- ========== СТАТУСЫ - МЯГКИЕ ЦВЕТА ========== -->
+    <Color x:Key="Success">#2DD4BF</Color>
+    <Color x:Key="SuccessLightBg">#2DD4BF10</Color>
+    <Color x:Key="Error">#F59E0B</Color>
+    <Color x:Key="ErrorLightBg">#F59E0B10</Color>
+    <Color x:Key="Warning">#F59E0B</Color>
+    <Color x:Key="WarningLightBg">#F59E0B10</Color>
+    <Color x:Key="Info">#2DD4BF</Color>
+    
+    <!-- ========== РОЛИ ========== -->
+    <Color x:Key="AdminColor">#F59E0B</Color>
+    <Color x:Key="TeacherColor">#2DD4BF</Color>
+    <Color x:Key="StudentColor">#2DD4BF</Color>
+    
+    <Color x:Key="ShadowColor">#2DD4BF20</Color>
 
 </ResourceDictionary>

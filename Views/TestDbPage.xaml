@@ -2,21 +2,57 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="OnlineTestingApp.Views.TestDbPage"
-             Title="Тест БД">
+             Title="Тест БД"
+             NavigationPage.HasNavigationBar="True">
     
-    <VerticalStackLayout Spacing="20" Padding="20">
-        <Label Text="Проверка подключения к базе данных"
-               FontSize="24"
-               HorizontalOptions="Center"/>
+    <Grid>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
         
-        <Button Text="Проверить подключение"
-                x:Name="TestConnectionButton"
-                BackgroundColor="#512BD4"
-                TextColor="White"/>
-        
-        <Editor x:Name="ResultEditor"
-                IsReadOnly="True"
-                AutoSize="TextChanges"
-                BackgroundColor="#F0F0F0"/>
-    </VerticalStackLayout>
+        <ScrollView>
+            <VerticalStackLayout Spacing="20" VerticalOptions="Center">
+                
+                <Frame Padding="0" Margin="0" HasShadow="False" BackgroundColor="Transparent">
+                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center" WidthRequest="450">
+                        
+                        <Frame WidthRequest="80"
+                               HeightRequest="80"
+                               CornerRadius="40"
+                               Background="{StaticResource PrimaryGradient}"
+                               HasShadow="False"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,20">
+                            <Label Text="🗄️" 
+                                   FontSize="40" 
+                                   TextColor="White"
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                        
+                        <Label Text="Проверка подключения к БД" 
+                               Style="{StaticResource TitleStyle}"
+                               Margin="0,0,0,4"/>
+
+                        <Button Text="Проверить подключение"
+                                x:Name="TestConnectionButton"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                WidthRequest="220"
+                                HorizontalOptions="Center"
+                                Margin="0,16,0,0"/>
+
+                        <Border Style="{StaticResource CardStyle}"
+                                Padding="16"
+                                Margin="0,16">
+                            <Editor x:Name="ResultEditor"
+                                    IsReadOnly="True"
+                                    AutoSize="TextChanges"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="14"/>
+                        </Border>
+                        
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

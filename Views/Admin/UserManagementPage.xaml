@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:OnlineTestingApp.Converters"
              x:Class="OnlineTestingApp.Views.Admin.UserManagementPage"
-             Title="Управление пользователями"
-             BackgroundColor="{StaticResource Background}">
+             Title="Управление пользователями">
 
     <Grid>
+        <Grid Background="{StaticResource BackgroundGradient}"/>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -14,26 +15,27 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок и кнопка создания -->
+        <!-- Заголовок -->
         <Grid Grid.Row="0" Padding="20,20,20,10" ColumnDefinitions="*, Auto">
             <Label Grid.Column="0" 
                    Text="👥 Пользователи" 
                    FontSize="24" 
                    FontAttributes="Bold"
-                   TextColor="{StaticResource TextPrimary}"/>
+                   TextColor="{StaticResource Primary}"/>
             
             <Button Grid.Column="1"
                     Text="+ Новый"
                     Command="{Binding CreateUserCommand}"
-                    BackgroundColor="{StaticResource Primary}"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource Primary20}"
+                    TextColor="{StaticResource Primary}"
                     FontSize="14"
+                    FontAttributes="Bold"
                     HeightRequest="40"
                     CornerRadius="20"
                     Padding="15,0"/>
         </Grid>
 
-        <!-- Фильтры -->
+        <!-- Фильтры - упрощенная версия -->
         <ScrollView Grid.Row="1" 
                    Orientation="Horizontal"
                    HeightRequest="50"
@@ -42,8 +44,8 @@
                 <Button Text="Все"
                         Command="{Binding FilterCommand}"
                         CommandParameter="all"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=all}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=all}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -52,8 +54,8 @@
                 <Button Text="Ученики"
                         Command="{Binding FilterCommand}"
                         CommandParameter="students"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=students}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=students}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -62,8 +64,8 @@
                 <Button Text="Учителя"
                         Command="{Binding FilterCommand}"
                         CommandParameter="teachers"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=teachers}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=teachers}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -72,8 +74,8 @@
                 <Button Text="Админы"
                         Command="{Binding FilterCommand}"
                         CommandParameter="admins"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=admins}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=admins}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -82,8 +84,8 @@
                 <Button Text="Активные"
                         Command="{Binding FilterCommand}"
                         CommandParameter="active"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=active}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=active}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -92,8 +94,8 @@
                 <Button Text="Заблок."
                         Command="{Binding FilterCommand}"
                         CommandParameter="inactive"
-                        BackgroundColor="{Binding SelectedFilter, Converter={StaticResource FilterBackgroundConverter}, ConverterParameter=inactive}"
-                        TextColor="{Binding SelectedFilter, Converter={StaticResource FilterTextConverter}, ConverterParameter=inactive}"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource TextSecondary}"
                         FontSize="13"
                         HeightRequest="38"
                         CornerRadius="19"
@@ -105,8 +107,8 @@
         <Border Grid.Row="2" 
                 Margin="20,0,20,10"
                 StrokeShape="RoundRectangle 12"
-                Stroke="{StaticResource SurfaceVariant}"
-                BackgroundColor="{StaticResource Surface}">
+                Stroke="{StaticResource Primary20}"
+                Background="{StaticResource Surface}">
             <Grid ColumnDefinitions="Auto, *" Padding="12">
                 <Label Grid.Column="0" Text="🔍" FontSize="18" VerticalOptions="Center"/>
                 <Entry Grid.Column="1"
@@ -157,7 +159,7 @@
                                        HorizontalOptions="Center"/>
                             </Border>
                             
-                            <!-- Имя и роль -->
+                            <!-- Имя -->
                             <Label Grid.Row="0" Grid.Column="1"
                                    Text="{Binding FullName}"
                                    FontSize="16"
@@ -200,34 +202,31 @@
                                                   Spacing="8"
                                                   VerticalOptions="Center">
                                 
-                                <!-- Редактировать -->
                                 <Button Text="✎"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Info}"
-                                        TextColor="White"
+                                        BackgroundColor="{StaticResource Primary20}"
+                                        TextColor="{StaticResource Primary}"
                                         FontSize="14"
                                         WidthRequest="40"
                                         HeightRequest="40"
                                         CornerRadius="20"/>
                                 
-                                <!-- Активировать/Деактивировать -->
                                 <Button Text="{Binding IsActive, Converter={StaticResource ToggleStatusIconConverter}}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleStatusCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{Binding IsActive, Converter={StaticResource ToggleStatusColorConverter}}"
-                                        TextColor="White"
+                                        BackgroundColor="{StaticResource Primary20}"
+                                        TextColor="{StaticResource Primary}"
                                         FontSize="14"
                                         WidthRequest="40"
                                         HeightRequest="40"
                                         CornerRadius="20"/>
                                 
-                                <!-- Удалить -->
                                 <Button Text="🗑️"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Error}"
-                                        TextColor="White"
+                                        BackgroundColor="{StaticResource Accent20}"
+                                        TextColor="{StaticResource Accent}"
                                         FontSize="14"
                                         WidthRequest="40"
                                         HeightRequest="40"
@@ -239,7 +238,6 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Индикатор загрузки -->
         <ActivityIndicator Grid.Row="0" Grid.RowSpan="4"
                           IsRunning="{Binding IsBusy}"
                           IsVisible="{Binding IsBusy}"
