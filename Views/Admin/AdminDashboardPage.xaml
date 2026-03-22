@@ -223,15 +223,17 @@
                 </Border>
                 
                 <!-- Кнопка выхода -->
-                <Button Text="Выйти из аккаунта"
-                        Command="{Binding LogoutCommand}"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource Error}"
-                        FontSize="15"
-                        FontAttributes="Bold"
-                        HeightRequest="48"
-                        CornerRadius="24"
-                        Margin="0,20,0,0"/>
+<Button Text="Выйти из аккаунта"
+        Command="{Binding LogoutCommand}"
+        BackgroundColor="{StaticResource SurfaceVariant}"
+        TextColor="{StaticResource TextSecondary}"
+        FontSize="15"
+        FontAttributes="Bold"
+        HeightRequest="48"
+        CornerRadius="24"
+        WidthRequest="200"
+        HorizontalOptions="Center"
+        Margin="0,20,0,0"/>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
