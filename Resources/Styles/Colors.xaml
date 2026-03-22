@@ -7,7 +7,15 @@
     <!-- ========== ОСНОВНЫЕ ЦВЕТА ========== -->
     <Color x:Key="Primary">#2DD4BF</Color>           
     <Color x:Key="PrimaryLight">#5EEAD4</Color>      
-    <Color x:Key="PrimaryDark">#14B8A6</Color> 
+    <Color x:Key="PrimaryDark">#14B8A6</Color>       
+    <Color x:Key="PrimarySoft">#E6F7F3</Color>       
+    
+    <Color x:Key="Accent">#F59E0B</Color>
+    <Color x:Key="AccentLight">#FBBF24</Color>
+    
+    <!-- Цвета для фильтров -->
+    <Color x:Key="FilterActive">#2DD4BF</Color>
+    <Color x:Key="FilterInactive">#F0F7F4</Color>
     
     <!-- Цвета с прозрачностью -->
     <Color x:Key="Primary10">#2DD4BF10</Color>
@@ -21,16 +29,16 @@
     <Color x:Key="Gray">#334155</Color>
     <Color x:Key="LightGray">#F1F5F9</Color>
     
-    <Color x:Key="Accent">#F59E0B</Color>
-    <Color x:Key="AccentLight">#FBBF24</Color>
-    <Color x:Key="Accent20">#F59E0B20</Color>
-    <Color x:Key="Accent40">#F59E0B40</Color>
-    
     <!-- ========== ФОНОВЫЕ ГРАДИЕНТЫ ========== -->
     <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#F0FDF9" Offset="0.0"/>
         <GradientStop Color="#E6F7F3" Offset="0.5"/>
         <GradientStop Color="#DCF5EF" Offset="1.0"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="SurfaceGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFFF" Offset="0"/>
+        <GradientStop Color="#F8FAFC" Offset="1"/>
     </LinearGradientBrush>
     
     <!-- ========== ГРАДИЕНТЫ ДЛЯ КНОПОК ========== -->
@@ -49,11 +57,6 @@
         <GradientStop Color="#FBBF24" Offset="1.0"/>
     </LinearGradientBrush>
     
-    <LinearGradientBrush x:Key="WarningGradient" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#F59E0B" Offset="0.0"/>
-        <GradientStop Color="#FBBF24" Offset="1.0"/>
-    </LinearGradientBrush>
-    
     <!-- ========== ПОВЕРХНОСТИ ========== -->
     <Color x:Key="Surface">#FFFFFF</Color>
     <Color x:Key="SurfaceVariant">#F9FFFD</Color>
@@ -65,7 +68,7 @@
     <Color x:Key="TextMuted">#94A3B8</Color>
     <Color x:Key="TextWhite">#FFFFFF</Color>
     
-    <!-- ========== СТАТУСЫ - МЯГКИЕ ЦВЕТА ========== -->
+    <!-- ========== СТАТУСЫ ========== -->
     <Color x:Key="Success">#2DD4BF</Color>
     <Color x:Key="SuccessLightBg">#2DD4BF10</Color>
     <Color x:Key="Error">#F59E0B</Color>
@@ -77,8 +80,8 @@
     <!-- ========== РОЛИ ========== -->
     <Color x:Key="AdminColor">#F59E0B</Color>
     <Color x:Key="TeacherColor">#2DD4BF</Color>
-    <Color x:Key="StudentColor">#2DD4BF</Color>
+    <Color x:Key="StudentColor">#10B981</Color>
     
-    <Color x:Key="ShadowColor">#2DD4BF20</Color>
+    <Color x:Key="ShadowColor">#2DD4BF30</Color>
 
 </ResourceDictionary>

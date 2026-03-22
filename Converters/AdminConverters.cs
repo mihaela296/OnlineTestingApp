@@ -71,19 +71,19 @@ namespace OnlineTestingApp.Converters
     }
 
     public class StatusBackgroundConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            if (value is bool isActive)
-                return isActive ? Color.FromArgb("#2DD4BF") : Color.FromArgb("#F59E0B");
-            return Color.FromArgb("#F59E0B");
-        }
-
-        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            return null;
-        }
+        if (value is bool isActive)
+            return isActive ? Color.FromArgb("#2DD4BF") : Color.FromArgb("#F59E0B");
+        return Color.FromArgb("#F59E0B");
     }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return null;
+    }
+}
 
     public class ToggleStatusIconConverter : IValueConverter
     {
@@ -101,19 +101,19 @@ namespace OnlineTestingApp.Converters
     }
 
     public class ToggleStatusColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            if (value is bool isActive)
-                return isActive ? Color.FromArgb("#F59E0B") : Color.FromArgb("#2DD4BF");
-            return Color.FromArgb("#F59E0B");
-        }
-
-        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            return null;
-        }
+        if (value is bool isActive)
+            return isActive ? Color.FromArgb("#F59E0B") : Color.FromArgb("#2DD4BF");
+        return Color.FromArgb("#F59E0B");
     }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return null;
+    }
+}
 
     public class IsTeacherConverter : IValueConverter
     {

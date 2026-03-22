@@ -333,12 +333,12 @@ namespace OnlineTestingApp.ViewModels.Admin
         public string Status { get; set; } = string.Empty;
         
         public string RoleColor => Role switch
-        {
-            "Admin" => "#F97316",
-            "Teacher" => "#2DD4BF",
-            "Student" => "#10B981",
-            _ => "#6B7280"
-        };
+{
+    "Admin" => "#F59E0B",    // Оранжевый для админа
+    "Teacher" => "#2DD4BF",  // Бирюзовый для учителя
+    "Student" => "#10B981",  // Зеленый для ученика
+    _ => "#6B7280"
+};
         
         public string StatusIcon => IsActive ? "🔓" : "🔒";
     }

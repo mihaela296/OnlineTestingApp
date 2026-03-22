@@ -26,8 +26,8 @@
             <Button Grid.Column="1"
                     Text="+ Новый"
                     Command="{Binding CreateUserCommand}"
-                    BackgroundColor="{StaticResource Primary20}"
-                    TextColor="{StaticResource Primary}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
                     FontSize="14"
                     FontAttributes="Bold"
                     HeightRequest="40"
@@ -35,82 +35,174 @@
                     Padding="15,0"/>
         </Grid>
 
-        <!-- Фильтры - упрощенная версия -->
+        <!-- Фильтры с выделением активного -->
         <ScrollView Grid.Row="1" 
                    Orientation="Horizontal"
-                   HeightRequest="50"
+                   HeightRequest="55"
                    Margin="20,0,20,10">
-            <HorizontalStackLayout Spacing="8">
+            <HorizontalStackLayout Spacing="12">
+                
+                <!-- Кнопка Все -->
                 <Button Text="Все"
                         Command="{Binding FilterCommand}"
                         CommandParameter="all"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="all">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 
+                <!-- Кнопка Ученики -->
                 <Button Text="Ученики"
                         Command="{Binding FilterCommand}"
                         CommandParameter="students"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="students">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 
+                <!-- Кнопка Учителя -->
                 <Button Text="Учителя"
                         Command="{Binding FilterCommand}"
                         CommandParameter="teachers"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="teachers">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 
+                <!-- Кнопка Админы -->
                 <Button Text="Админы"
                         Command="{Binding FilterCommand}"
                         CommandParameter="admins"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="admins">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 
+                <!-- Кнопка Активные -->
                 <Button Text="Активные"
                         Command="{Binding FilterCommand}"
                         CommandParameter="active"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="active">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
                 
+                <!-- Кнопка Заблокированные -->
                 <Button Text="Заблок."
                         Command="{Binding FilterCommand}"
                         CommandParameter="inactive"
-                        BackgroundColor="{StaticResource SurfaceVariant}"
-                        TextColor="{StaticResource TextSecondary}"
-                        FontSize="13"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="15,0"/>
+                        CornerRadius="22"
+                        HeightRequest="44"
+                        Padding="20,0"
+                        FontSize="14"
+                        FontAttributes="Bold">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button"
+                                     Binding="{Binding SelectedFilter}"
+                                     Value="inactive">
+                            <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                            <Setter Property="TextColor" Value="White"/>
+                        </DataTrigger>
+                    </Button.Triggers>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="BackgroundColor" Value="{StaticResource SurfaceVariant}"/>
+                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </HorizontalStackLayout>
         </ScrollView>
 
         <!-- Поиск -->
         <Border Grid.Row="2" 
                 Margin="20,0,20,10"
-                StrokeShape="RoundRectangle 12"
-                Stroke="{StaticResource Primary20}"
+                StrokeShape="RoundRectangle 14"
+                Stroke="{StaticResource Primary30}"
                 Background="{StaticResource Surface}">
-            <Grid ColumnDefinitions="Auto, *" Padding="12">
-                <Label Grid.Column="0" Text="🔍" FontSize="18" VerticalOptions="Center"/>
+            <Grid ColumnDefinitions="Auto, *" Padding="14">
+                <Label Grid.Column="0" Text="🔍" FontSize="18" VerticalOptions="Center"
+                       TextColor="{StaticResource Primary}"/>
                 <Entry Grid.Column="1"
                        x:Name="SearchEntry"
                        Text="{Binding SearchText}"
@@ -140,7 +232,18 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                    <Border Margin="0,0,0,12"
+                            Padding="0"
+                            StrokeThickness="0"
+                            Background="{StaticResource Surface}"
+                            StrokeShape="RoundRectangle 20">
+                        <Border.Shadow>
+                            <Shadow Brush="{StaticResource ShadowColor}" 
+                                    Radius="12" 
+                                    Offset="0,3" 
+                                    Opacity="0.15"/>
+                        </Border.Shadow>
+                        
                         <Grid RowDefinitions="Auto, Auto, Auto" 
                               ColumnDefinitions="Auto, *, Auto"
                               Padding="15">
@@ -164,8 +267,7 @@
                                    Text="{Binding FullName}"
                                    FontSize="16"
                                    FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"
-                                   LineBreakMode="TailTruncation"/>
+                                   TextColor="{StaticResource TextPrimary}"/>
                             
                             <!-- Роль и статус -->
                             <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8">
@@ -193,8 +295,7 @@
                             <Label Grid.Row="2" Grid.Column="1"
                                    Text="{Binding Email}"
                                    FontSize="12"
-                                   TextColor="{StaticResource TextSecondary}"
-                                   LineBreakMode="TailTruncation"/>
+                                   TextColor="{StaticResource TextMuted}"/>
                             
                             <!-- Кнопки действий -->
                             <HorizontalStackLayout Grid.Row="0" Grid.Column="2" 
@@ -205,9 +306,10 @@
                                 <Button Text="✎"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Primary20}"
-                                        TextColor="{StaticResource Primary}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        TextColor="White"
                                         FontSize="14"
+                                        FontAttributes="Bold"
                                         WidthRequest="40"
                                         HeightRequest="40"
                                         CornerRadius="20"/>
@@ -215,9 +317,10 @@
                                 <Button Text="{Binding IsActive, Converter={StaticResource ToggleStatusIconConverter}}"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleStatusCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Primary20}"
-                                        TextColor="{StaticResource Primary}"
+                                        BackgroundColor="{StaticResource PrimaryLight}"
+                                        TextColor="White"
                                         FontSize="14"
+                                        FontAttributes="Bold"
                                         WidthRequest="40"
                                         HeightRequest="40"
                                         CornerRadius="20"/>
@@ -225,9 +328,10 @@
                                 <Button Text="🗑️"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
                                         CommandParameter="{Binding UserId}"
-                                        BackgroundColor="{StaticResource Accent20}"
-                                        TextColor="{StaticResource Accent}"
+                                        BackgroundColor="{StaticResource PrimaryDark}"
+                                        TextColor="White"
                                         FontSize="14"
+                                        FontAttributes="Bold"
                                         WidthRequest="40"
                                         HeightRequest="40"
                                         CornerRadius="20"/>
