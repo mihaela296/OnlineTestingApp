@@ -83,5 +83,7 @@
     <Color x:Key="StudentColor">#10B981</Color>
     
     <Color x:Key="ShadowColor">#2DD4BF30</Color>
+    <!-- Добавьте в Colors.xaml -->
+<Color x:Key="Background">#F0FDF9</Color>
 
 </ResourceDictionary>

@@ -7,51 +7,133 @@
     <Grid>
         <Grid Background="{StaticResource BackgroundGradient}"/>
         
-        <Ellipse Fill="#2DD4BF08" WidthRequest="500" HeightRequest="500" HorizontalOptions="Center" VerticalOptions="Center"/>
+        <!-- Декоративные кружочки вокруг -->
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="180"
+                 HeightRequest="180"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="0,-150,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF12"
+                 WidthRequest="140"
+                 HeightRequest="140"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="0,-120,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF20"
+                 WidthRequest="100"
+                 HeightRequest="100"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="0,-90,0,0"/>
+        
+        <!-- Маленькие кружочки по углам -->
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="80"
+                 HeightRequest="80"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="30,80,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="70"
+                 HeightRequest="70"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,100,30,0"/>
+        
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="90"
+                 HeightRequest="90"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="20,0,0,100"/>
+        
+        <Ellipse Fill="#2DD4BF08"
+                 WidthRequest="75"
+                 HeightRequest="75"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,25,120"/>
+        
+        <!-- Серединные кружочки -->
+        <Ellipse Fill="#2DD4BF10"
+                 WidthRequest="110"
+                 HeightRequest="110"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Center"
+                 Margin="-55,0,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF10"
+                 WidthRequest="110"
+                 HeightRequest="110"
+                 HorizontalOptions="End"
+                 VerticalOptions="Center"
+                 Margin="0,0,-55,0"/>
+        
+        <Ellipse Fill="#2DD4BF10"
+                 WidthRequest="95"
+                 HeightRequest="95"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Start"
+                 Margin="0,-40,0,0"/>
+        
+        <Ellipse Fill="#2DD4BF10"
+                 WidthRequest="95"
+                 HeightRequest="95"
+                 HorizontalOptions="Center"
+                 VerticalOptions="End"
+                 Margin="0,0,0,-40"/>
         
         <ScrollView>
-            <VerticalStackLayout Spacing="20" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="30" Padding="30" VerticalOptions="Center">
                 
-                <Frame Padding="0" Margin="0" HasShadow="False" BackgroundColor="Transparent">
-                    <VerticalStackLayout Spacing="20" HorizontalOptions="Center" WidthRequest="450">
-                        
-                        <Frame WidthRequest="100"
-                               HeightRequest="100"
-                               CornerRadius="50"
-                               Background="{StaticResource PrimaryGradient}"
-                               HasShadow="False"
-                               HorizontalOptions="Center"
-                               Margin="0,0,0,20">
-                            <Label Text="👨‍🏫" 
-                                   FontSize="48" 
-                                   TextColor="White"
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center"/>
-                        </Frame>
-                        
-                        <Label Text="Ожидание подтверждения" 
-                               Style="{StaticResource TitleStyle}"
-                               Margin="0,0,0,4"/>
-                        
-                        <Label Text="Ваша заявка отправлена!"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource Primary}"
-                               HorizontalOptions="Center"
-                               Margin="0,0,0,8"/>
-                        
-                        <Label Text="Ожидайте подтверждения администратором."
-                               Style="{StaticResource SubtitleStyle}"/>
-
-                        <Button Text="Выйти из аккаунта"
-                                x:Name="LogoutButton"
-                                Style="{StaticResource ErrorButtonStyle}"
-                                WidthRequest="200"
-                                HorizontalOptions="Center"
-                                Margin="0,32,0,0"/>
-                        
-                    </VerticalStackLayout>
-                </Frame>
+                <!-- Центральный кружок с иконкой -->
+                <Border WidthRequest="120"
+                        HeightRequest="120"
+                        HorizontalOptions="Center"
+                        StrokeShape="RoundRectangle 60"
+                        Background="{StaticResource PrimaryGradient}"
+                        Margin="0,0,0,20">
+                    <Label Text="👨‍🏫" 
+                           FontSize="58" 
+                           TextColor="White"
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"/>
+                </Border>
+                
+                <Label Text="Панель учителя" 
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource Primary}"
+                       HorizontalOptions="Center"/>
+                
+                <Label Text="Ваша заявка отправлена на подтверждение"
+                       FontSize="16"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+                
+                <Label Text="Ожидайте, пока администратор примет вашу заявку"
+                       FontSize="16"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+                
+                <Button Text="Выйти из аккаунта"
+                        x:Name="LogoutButton"
+                        BackgroundColor="{StaticResource SurfaceVariant}"
+                        TextColor="{StaticResource Error}"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="24"
+                        WidthRequest="200"
+                        HorizontalOptions="Center"
+                        Margin="0,40,0,0"/>
+                
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

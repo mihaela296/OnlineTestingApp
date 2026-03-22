@@ -29,67 +29,69 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(bool success, string message, User? user)> LoginAsync(LoginModel model)
-{
-    try
-    {
-        var user = await _dbContext.Users
-            .Include(u => u.Role)
-            .Include(u => u.Profile)
-            .FirstOrDefaultAsync(u => u.Email == model.Email);
-
-        if (user == null)
-            return (false, "Пользователь не найден", null);
-
-        // Проверяем, активен ли аккаунт
-        if (!user.IsActive)
         {
-            return (false, "account_deactivated", user); // Специальный статус для деактивированных
+            try
+            {
+                var user = await _dbContext.Users
+                    .Include(u => u.Role)
+                    .Include(u => u.Profile)
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null)
+                    return (false, "Пользователь не найден", null);
+
+                // Проверяем пароль
+                var inputHash = HashPassword(model.Password);
+                if (user.PasswordHash != inputHash)
+                {
+                    // Временное решение для админа
+                    if (model.Email == "admin@example.com" && model.Password == "admin123")
+                    {
+                        user.PasswordHash = HashPassword("admin123");
+                    }
+                    else
+                    {
+                        return (false, "Неверный пароль", null);
+                    }
+                }
+
+                // Если пользователь не активен
+                if (!user.IsActive)
+                {
+                    // Для учителей - специальный статус ожидания подтверждения
+                    if (user.Role?.RoleName == "Teacher")
+                    {
+                        return (false, "pending_approval", user);
+                    }
+                    return (false, "account_deactivated", user);
+                }
+
+                user.LastLoginDate = DateTime.UtcNow;
+                
+                if (_deviceService != null)
+                {
+                    await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
+                }
+                await _dbContext.SaveChangesAsync();
+
+                var userJson = JsonSerializer.Serialize(new
+                {
+                    user.UserId,
+                    user.Email,
+                    user.Username,
+                    Role = user.Role?.RoleName,
+                    user.IsActive
+                });
+                Preferences.Set("current_user", userJson);
+
+                return (true, "Успешный вход", user);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Ошибка входа: {ex.Message}", null);
+            }
         }
 
-        // ВРЕМЕННОЕ РЕШЕНИЕ: для админа используем простую проверку
-        if (model.Email == "admin@example.com")
-        {
-            if (model.Password != "admin123")
-                return (false, "Неверный пароль", null);
-            
-            // Устанавливаем правильный хэш для будущих входов
-            user.PasswordHash = HashPassword("admin123");
-        }
-        else
-        {
-            // Для остальных пользователей - нормальная проверка хэша
-            var inputHash = HashPassword(model.Password);
-            if (user.PasswordHash != inputHash)
-                return (false, "Неверный пароль", null);
-        }
-
-        user.LastLoginDate = DateTime.UtcNow;
-        
-        if (_deviceService != null)
-        {
-            await _deviceService.RegisterCurrentDeviceAsync(user.UserId);
-        }
-        await _dbContext.SaveChangesAsync();
-
-        var userJson = JsonSerializer.Serialize(new
-        {
-            user.UserId,
-            user.Email,
-            user.Username,
-            Role = user.Role?.RoleName,
-            user.IsActive
-        });
-        Preferences.Set("current_user", userJson);
-
-        return (true, "Успешный вход", user);
-    }
-    catch (Exception ex)
-    {
-        return (false, $"Ошибка входа: {ex.Message}", null);
-    }
-}
-
-        // Остальные методы без изменений...
         public async Task<(bool success, string message, User? user)> RegisterAsync(RegisterModel model)
         {
             try
@@ -186,45 +188,44 @@ namespace OnlineTestingApp.Services
         }
 
         public async Task<(string status, string message)> GetUserStatusAsync(int userId)
-{
-    try
-    {
-        var user = await _dbContext.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user == null)
-            return ("not_found", "Пользователь не найден");
-
-        // Добавляем отладку
-        System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync: UserId={userId}, IsActive={user.IsActive}, Role={user.Role?.RoleName}");
-
-        if (!user.IsActive)
         {
-            if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
+            try
             {
-                return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
+                var user = await _dbContext.Users
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+                if (user == null)
+                    return ("not_found", "Пользователь не найден");
+
+                System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync: UserId={userId}, IsActive={user.IsActive}, Role={user.Role?.RoleName}");
+
+                if (!user.IsActive)
+                {
+                    if (user.Role?.RoleName == "Teacher" || user.Role?.RoleName == "Admin")
+                    {
+                        return ("pending_approval", "Ваша заявка на регистрацию ожидает подтверждения администратором");
+                    }
+                    return ("inactive", "Ваш аккаунт деактивирован");
+                }
+
+                if (user.Role?.RoleName == "Student")
+                {
+                    var hasGroups = await _dbContext.UserGroups
+                        .AnyAsync(ug => ug.UserId == userId);
+                    
+                    if (!hasGroups)
+                        return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
+                }
+
+                return ("active", "Аккаунт активен");
             }
-            return ("inactive", "Ваш аккаунт деактивирован");
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync error: {ex.Message}");
+                return ("error", $"Ошибка: {ex.Message}");
+            }
         }
-
-        if (user.Role?.RoleName == "Student")
-        {
-            var hasGroups = await _dbContext.UserGroups
-                .AnyAsync(ug => ug.UserId == userId);
-            
-            if (!hasGroups)
-                return ("pending_group", "Вы еще не добавлены ни в одну группу. Ожидайте, пока учитель добавит вас.");
-        }
-
-        return ("active", "Аккаунт активен");
-    }
-    catch (Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"GetUserStatusAsync error: {ex.Message}");
-        return ("error", $"Ошибка: {ex.Message}");
-    }
-}
 
         public Task LogoutAsync()
         {
@@ -295,39 +296,33 @@ namespace OnlineTestingApp.Services
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
-                // Нормализация номера телефона: всегда начинается с +7
+        
         public static string NormalizePhoneNumber(string? phone)
         {
             if (string.IsNullOrWhiteSpace(phone))
                 return string.Empty;
 
-            // Убираем все нецифровые символы
             var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
 
             if (string.IsNullOrEmpty(digitsOnly))
                 return string.Empty;
 
-            // Если первая цифра 8, заменяем на 7
             if (digitsOnly.Length == 11 && digitsOnly[0] == '8')
             {
                 digitsOnly = "7" + digitsOnly.Substring(1);
             }
-            // Если номер из 11 цифр и начинается не с 7, меняем первую цифру на 7
             else if (digitsOnly.Length == 11 && digitsOnly[0] != '7')
             {
                 digitsOnly = "7" + digitsOnly.Substring(1);
             }
-            // Если номер из 10 цифр, добавляем 7 в начало
             else if (digitsOnly.Length == 10)
             {
                 digitsOnly = "7" + digitsOnly;
             }
 
-            // Возвращаем в формате +7XXXXXXXXXX
             return $"+{digitsOnly}";
         }
 
-        // Форматирование номера для отображения: +X (XXX) XXX-XX-XX
         public static string FormatPhoneForDisplay(string? phone)
         {
             if (string.IsNullOrWhiteSpace(phone))

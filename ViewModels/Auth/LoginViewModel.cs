@@ -62,6 +62,19 @@ namespace OnlineTestingApp.ViewModels.Auth
                 
                 if (!result.success)
                 {
+                    // Для учителей - страница ожидания подтверждения
+                    if (result.message == "pending_approval" && result.user != null)
+                    {
+                        var pendingPage = new PendingApprovalPage();
+                        var window = GetCurrentWindow();
+                        if (window?.Page != null)
+                        {
+                            await window.Page.Navigation.PushAsync(pendingPage);
+                            return;
+                        }
+                    }
+                    
+                    // Для деактивированных аккаунтов
                     if (result.message == "account_deactivated" && result.user != null)
                     {
                         var blockedPage = new AccountBlockedPage(
@@ -193,7 +206,18 @@ namespace OnlineTestingApp.ViewModels.Auth
                     break;
                     
                 default:
-                    await Shell.Current.GoToAsync("LoginPage");
+                    // Для статуса "inactive" показываем страницу блокировки
+                    if (status.status == "inactive")
+                    {
+                        var blockedPage = new AccountBlockedPage(
+                            new AccountBlockedViewModel(_authService, user.Email)
+                        );
+                        await window.Page.Navigation.PushAsync(blockedPage);
+                    }
+                    else
+                    {
+                        await Shell.Current.GoToAsync("LoginPage");
+                    }
                     break;
             }
         }
