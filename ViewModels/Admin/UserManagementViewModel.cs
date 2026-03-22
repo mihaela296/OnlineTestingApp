@@ -301,8 +301,8 @@ namespace OnlineTestingApp.ViewModels.Admin
                     return;
                 }
 
-                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
-                var editViewModel = new EditUserViewModel(dbContext, user);
+                // Передаем фабрику вместо контекста
+                var editViewModel = new EditUserViewModel(_dbContextFactory, user);
                 var editPage = new EditUserPage(editViewModel);
                 
                 var window = Application.Current?.Windows.FirstOrDefault();
@@ -333,12 +333,12 @@ namespace OnlineTestingApp.ViewModels.Admin
         public string Status { get; set; } = string.Empty;
         
         public string RoleColor => Role switch
-{
-    "Admin" => "#F59E0B",    // Оранжевый для админа
-    "Teacher" => "#2DD4BF",  // Бирюзовый для учителя
-    "Student" => "#10B981",  // Зеленый для ученика
-    _ => "#6B7280"
-};
+        {
+            "Admin" => "#F59E0B",    // Оранжевый для админа
+            "Teacher" => "#2DD4BF",  // Бирюзовый для учителя
+            "Student" => "#10B981",  // Зеленый для ученика
+            _ => "#6B7280"
+        };
         
         public string StatusIcon => IsActive ? "🔓" : "🔒";
     }

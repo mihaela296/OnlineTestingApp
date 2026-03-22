@@ -5,12 +5,13 @@ using OnlineTestingApp.Data;
 using OnlineTestingApp.Models;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using static OnlineTestingApp.ViewModels.Admin.UserManagementViewModel;
 
 namespace OnlineTestingApp.ViewModels.Admin
 {
     public partial class EditUserViewModel : ObservableObject
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly UserItem _originalUser;
 
         [ObservableProperty]
@@ -60,9 +61,9 @@ namespace OnlineTestingApp.ViewModels.Admin
 
         public string StatusText => EditIsActive ? "Активен" : "Заблокирован";
 
-        public EditUserViewModel(AppDbContext dbContext, UserItem user)
+        public EditUserViewModel(IDbContextFactory<AppDbContext> dbContextFactory, UserItem user)
         {
-            _dbContext = dbContext;
+            _dbContextFactory = dbContextFactory;
             _originalUser = user;
             User = user;
 
@@ -73,6 +74,12 @@ namespace OnlineTestingApp.ViewModels.Admin
             EditPhoneNumber = user.PhoneNumber ?? string.Empty;
             EditRole = user.Role;
             EditIsActive = user.IsActive;
+            
+            // Проверяем валидность при загрузке
+            ValidateUsername();
+            ValidateEmail();
+            
+            System.Diagnostics.Debug.WriteLine($"EditUserViewModel создан: IsValid={IsValid}, Username={EditUsername}, Email={EditEmail}");
         }
 
         private string CleanPhoneNumber(string phone)
@@ -92,11 +99,13 @@ namespace OnlineTestingApp.ViewModels.Admin
 
         partial void OnEditUsernameChanged(string value)
         {
+            System.Diagnostics.Debug.WriteLine($"Username изменен: {value}");
             ValidateUsername();
         }
 
         partial void OnEditEmailChanged(string value)
         {
+            System.Diagnostics.Debug.WriteLine($"Email изменен: {value}");
             ValidateEmail();
         }
 
@@ -109,6 +118,7 @@ namespace OnlineTestingApp.ViewModels.Admin
         {
             IsUsernameValid = !string.IsNullOrWhiteSpace(EditUsername) && EditUsername.Length >= 3;
             UpdateIsValid();
+            System.Diagnostics.Debug.WriteLine($"ValidateUsername: IsUsernameValid={IsUsernameValid}");
         }
 
         private void ValidateEmail()
@@ -123,16 +133,20 @@ namespace OnlineTestingApp.ViewModels.Admin
                 IsEmailValid = false;
             }
             UpdateIsValid();
+            System.Diagnostics.Debug.WriteLine($"ValidateEmail: IsEmailValid={IsEmailValid}");
         }
 
         private void UpdateIsValid()
         {
             IsValid = IsUsernameValid && IsEmailValid;
+            System.Diagnostics.Debug.WriteLine($"UpdateIsValid: IsValid={IsValid}");
         }
 
         [RelayCommand]
         private async Task SaveAsync()
         {
+            System.Diagnostics.Debug.WriteLine("SaveAsync ВЫЗВАН!");
+            
             try
             {
                 IsSaving = true;
@@ -147,41 +161,48 @@ namespace OnlineTestingApp.ViewModels.Admin
                     {
                         ErrorMessage = "Номер телефона должен содержать 11 цифр";
                         HasError = true;
+                        System.Diagnostics.Debug.WriteLine($"Ошибка: {ErrorMessage}");
                         return;
                     }
                 }
 
-                var existingUser = await _dbContext.Users
+                // Создаем новый контекст для операции
+                using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+
+                var existingUser = await dbContext.Users
                     .FirstOrDefaultAsync(u => u.Email == EditEmail && u.UserId != User.UserId);
                 
                 if (existingUser != null)
                 {
                     ErrorMessage = "Пользователь с таким email уже существует";
                     HasError = true;
+                    System.Diagnostics.Debug.WriteLine($"Ошибка: {ErrorMessage}");
                     return;
                 }
 
-                existingUser = await _dbContext.Users
+                existingUser = await dbContext.Users
                     .FirstOrDefaultAsync(u => u.Username == EditUsername && u.UserId != User.UserId);
                 
                 if (existingUser != null)
                 {
                     ErrorMessage = "Пользователь с таким именем уже существует";
                     HasError = true;
+                    System.Diagnostics.Debug.WriteLine($"Ошибка: {ErrorMessage}");
                     return;
                 }
 
-                var dbUser = await _dbContext.Users
+                var dbUser = await dbContext.Users
                     .Include(u => u.Profile)
                     .FirstOrDefaultAsync(u => u.UserId == User.UserId);
 
                 if (dbUser == null)
                 {
                     await ShowAlertAsync("Ошибка", "Пользователь не найден в базе данных");
+                    System.Diagnostics.Debug.WriteLine("Ошибка: пользователь не найден");
                     return;
                 }
 
-                var role = await _dbContext.Roles
+                var role = await dbContext.Roles
                     .FirstOrDefaultAsync(r => r.RoleName == EditRole);
 
                 dbUser.Username = EditUsername;
@@ -198,7 +219,7 @@ namespace OnlineTestingApp.ViewModels.Admin
                         LastName = EditLastName,
                         PhoneNumber = cleanPhone
                     };
-                    _dbContext.Profiles.Add(dbUser.Profile);
+                    dbContext.Profiles.Add(dbUser.Profile);
                 }
                 else
                 {
@@ -207,7 +228,8 @@ namespace OnlineTestingApp.ViewModels.Admin
                     dbUser.Profile.PhoneNumber = cleanPhone;
                 }
 
-                await _dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
+                System.Diagnostics.Debug.WriteLine("Сохранение успешно!");
 
                 User.Username = EditUsername;
                 User.Email = EditEmail;
@@ -221,6 +243,7 @@ namespace OnlineTestingApp.ViewModels.Admin
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Ошибка сохранения: {ex.Message}");
                 await ShowAlertAsync("Ошибка", $"Не удалось сохранить изменения: {ex.Message}");
             }
             finally
@@ -232,6 +255,7 @@ namespace OnlineTestingApp.ViewModels.Admin
         [RelayCommand]
         private async Task CancelAsync()
         {
+            System.Diagnostics.Debug.WriteLine("CancelAsync вызван!");
             await ClosePageAsync(false);
         }
 

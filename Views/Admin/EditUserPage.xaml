@@ -140,8 +140,8 @@
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                             <Button Grid.Column="0"
+                                    x:Name="CancelButton"
                                     Text="Отмена"
-                                    Command="{Binding CancelCommand}"
                                     BackgroundColor="{StaticResource SurfaceVariant}"
                                     TextColor="{StaticResource TextSecondary}"
                                     FontSize="15"
@@ -150,8 +150,8 @@
                                     CornerRadius="24"/>
                             
                             <Button Grid.Column="1"
+                                    x:Name="SaveButton"
                                     Text="Сохранить"
-                                    Command="{Binding SaveCommand}"
                                     BackgroundColor="{StaticResource Primary}"
                                     TextColor="White"
                                     FontSize="15"
